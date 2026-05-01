@@ -344,7 +344,7 @@ function HomeScreen({ setScreen }) {
     <div style={{ padding: "40px 24px", maxWidth: 900, margin: "0 auto" }} className="fadeIn">
       <div style={{ marginBottom: 40 }}>
         <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--accent)", letterSpacing: "0.15em", marginBottom: 10 }}>// OPERATIONAL TOOLS</div>
-        <h1 style={{ fontFamily: "var(--sans)", fontWeight: 800, fontSize: 32, color: "var(--text)", letterSpacing: "-0.03em", lineHeight: 1.1 }}>Engineering<br />Toolbox v2.1</h1>
+        <h1 style={{ fontFamily: "var(--sans)", fontWeight: 800, fontSize: 32, color: "var(--text)", letterSpacing: "-0.03em", lineHeight: 1.1 }}>MOC Toolbox v2.1</h1>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
         {modules.map(m => (
