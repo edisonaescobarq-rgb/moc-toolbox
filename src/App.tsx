@@ -65,36 +65,38 @@ const CSS = `
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
 const vibrationRows = [
-  { id: "alt_gt_fl300", category: "Altitude", parameter: "> FL300", scores: [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0] },
-  { id: "spd_le_250", category: "Speed (kts)", parameter: "≤ 250", scores: [0,1,1,1,3,4,0,1,3,0,1,1,0,0,0,0] },
-  { id: "spd_250_280", category: "Speed (kts)", parameter: "250 ≤ S < 280", scores: [3,3,3,4,1,3,0,3,3,3,4,3,0,0,0,0] },
-  { id: "spd_280_320", category: "Speed (kts)", parameter: "280 ≤ S < 320", scores: [4,2,4,2,1,3,0,3,4,3,4,3,0,0,0,0] },
-  { id: "spd_ge_320", category: "Speed (kts)", parameter: "S ≥ 320", scores: [3,1,4,1,1,0,0,6,4,4,4,3,0,0,0,0] },
-  { id: "phase_climb", category: "Flight Phase", parameter: "Climb", scores: [3,3,4,5,3,3,0,0,3,0,6,3,0,0,0,0] },
-  { id: "phase_cruise", category: "Flight Phase", parameter: "Cruise", scores: [3,1,3,0,0,0,0,0,3,6,0,3,0,0,0,0] },
-  { id: "phase_descent", category: "Flight Phase", parameter: "Descent", scores: [2,1,0,0,1,1,0,0,1,0,0,1,0,0,0,0] },
-  { id: "phase_approach", category: "Flight Phase", parameter: "Approach", scores: [4,2,3,1,1,1,0,0,4,3,4,3,0,0,0,0] },
-  { id: "slatflap_clean", category: "Slats / Flaps", parameter: "Clean", scores: [0,0,0,0,0,0,20,20,20,20,20,20,0,0,0,0] },
-  { id: "slatflap_extended", category: "Slats / Flaps", parameter: "Extended", scores: [4,1,2,1,4,6,0,10,0,0,0,0,0,0,0,0] },
-  { id: "area_cockpit", category: "Affected Area", parameter: "Cockpit", scores: [0,1,2,1,3,1,0,1,3,1,1,1,0,0,0,0] },
-  { id: "area_fwd", category: "Affected Area", parameter: "FWD Cabin", scores: [1,2,1,2,1,1,0,-5,0,0,0,0,0,0,0,0] },
-  { id: "area_mid", category: "Affected Area", parameter: "Mid Cabin", scores: [2,3,3,3,1,3,0,-10,6,6,6,0,0,0,0,0] },
-  { id: "area_aft", category: "Affected Area", parameter: "Aft Cabin", scores: [4,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0] },
-  { id: "perception_whistling", category: "Perception", parameter: "Whistling", scores: [0,0,0,0,0,0,20,10,20,20,20,20,20,0,0,0] },
-  { id: "perception_rumbling", category: "Perception", parameter: "Rumbling", scores: [3,0,0,0,3,0,0,1,0,0,0,0,0,0,0,0] },
-  { id: "perception_pure", category: "Perception", parameter: "Pure Vibration", scores: [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
-  { id: "intensity_moderate", category: "Intensity", parameter: "Moderate", scores: [1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0] },
-  { id: "intensity_strong", category: "Intensity", parameter: "Strong", scores: [1,0,1,0,1,0,0,0,1,0,0,0,0,0,0,0] },
-  { id: "felt_vertically", category: "Felt", parameter: "Vertically", scores: [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0] },
-  { id: "felt_laterally", category: "Felt", parameter: "Laterally", scores: [0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0] },
-  { id: "param_airbrakes", category: "Param Change", parameter: "Airbrakes Ext.", scores: [0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0] },
-  { id: "param_thrust", category: "Param Change", parameter: "Thrust", scores: [0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0] },
-  { id: "param_altitude", category: "Param Change", parameter: "Altitude", scores: [0,0,2,0,0,0,0,0,2,0,0,0,0,0,0,0] },
-  { id: "param_turn", category: "Param Change", parameter: "Turn", scores: [0,5,0,0,0,0,0,0,1,0,0,0,0,0,0,0] },
-  { id: "ctrl_yaw", category: "Flight Controls", parameter: "Yaw", scores: [0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0] },
-  { id: "ctrl_pitch", category: "Flight Controls", parameter: "Pitch", scores: [10,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0] },
-  { id: "ctrl_roll", category: "Flight Controls", parameter: "Roll", scores: [0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
-  { id: "ctrl_no_effect", category: "Flight Controls", parameter: "No Effect", scores: [0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "alt_gt_fl300",   category: "Altitude",                  parameter: "> FL300",               scores: [0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "spd_le_250",     category: "Speed (kts)",               parameter: "≤ 250",                 scores: [0,1,1,1,1,4,0,1,3,1,0,1,1,0,0,0] },
+  { id: "spd_250_280",    category: "Speed (kts)",               parameter: "250 ≤ S < 280",          scores: [1,3,4,3,2,0,0,3,1,3,4,3,3,0,0,0] },
+  { id: "spd_280_320",    category: "Speed (kts)",               parameter: "280 ≤ S < 320",          scores: [3,2,2,2,3,0,0,3,1,3,4,3,4,0,0,0] },
+  { id: "spd_ge_320",     category: "Speed (kts)",               parameter: "S ≥ 320",               scores: [4,1,1,1,2,0,0,3,1,3,4,3,4,0,0,0] },
+  { id: "phase_climb",    category: "Flight Phase",              parameter: "Climb",                  scores: [3,1,4,0,3,0,0,6,3,1,0,1,1,0,0,0] },
+  { id: "phase_cruise",   category: "Flight Phase",              parameter: "Cruise",                 scores: [3,3,3,5,3,0,0,0,0,3,6,3,3,0,0,0] },
+  { id: "phase_descent",  category: "Flight Phase",              parameter: "Descent",                scores: [2,1,0,0,0,0,0,0,0,1,0,1,1,0,0,0] },
+  { id: "phase_approach", category: "Flight Phase",              parameter: "Approach",               scores: [0,1,3,1,0,6,0,0,3,1,0,1,1,0,0,0] },
+  { id: "slatflap_clean",    category: "Slats / Flaps",          parameter: "Clean",                  scores: [4,2,1,2,4,0,0,4,2,3,4,3,3,0,0,0] },
+  { id: "slatflap_extended", category: "Slats / Flaps",          parameter: "Extended",               scores: [0,1,2,1,1,10,0,0,2,1,0,1,1,0,0,0] },
+  { id: "area_cockpit",   category: "Affected Area",             parameter: "Cockpit",                scores: [0,2,1,1,3,1,0,6,0,0,0,3,0,0,0,0] },
+  { id: "area_fwd",       category: "Affected Area",             parameter: "FWD Cabin",              scores: [1,1,2,2,1,1,0,0,0,0,0,3,0,0,0,0] },
+  { id: "area_mid",       category: "Affected Area",             parameter: "Mid Cabin",              scores: [2,1,3,3,1,3,0,-5,6,6,6,0,3,0,0,0] },
+  { id: "area_aft",       category: "Affected Area",             parameter: "Aft Cabin",              scores: [4,2,0,0,2,1,0,-10,0,0,0,0,3,0,0,0] },
+  { id: "perception_whistling", category: "Perception",          parameter: "Whistling",              scores: [0,0,0,0,0,0,0,0,0,0,0,20,20,0,0,0] },
+  { id: "perception_rumbling",  category: "Perception",          parameter: "Rumbling",               scores: [0,0,0,0,0,0,0,10,20,20,20,0,0,0,0,0] },
+  { id: "perception_pure",      category: "Perception",          parameter: "Pure Vibration",         scores: [20,20,20,20,20,20,0,10,0,0,0,0,0,0,0,0] },
+  { id: "intensity_light",    category: "Intensity",             parameter: "Light",                  scores: [0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0] },
+  { id: "intensity_moderate", category: "Intensity",             parameter: "Moderate",               scores: [1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "intensity_strong",   category: "Intensity",             parameter: "Strong",                 scores: [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "felt_vertically",  category: "Felt",                    parameter: "Vertically",             scores: [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "felt_laterally",   category: "Felt",                    parameter: "Laterally",              scores: [0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "param_airbrakes",  category: "Param Change (AP ON)",    parameter: "Airbrakes Ext.",         scores: [3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "param_thrust",     category: "Param Change (AP ON)",    parameter: "Thrust",                 scores: [2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "param_altitude",   category: "Param Change (AP ON)",    parameter: "Altitude",               scores: [2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "param_turn",       category: "Param Change (AP ON)",    parameter: "Turn",                   scores: [0,0,5,0,1,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ctrl_yaw",         category: "Flight Controls (AP OFF)", parameter: "Yaw stops vibration",   scores: [0,0,0,0,8,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ctrl_pitch",       category: "Flight Controls (AP OFF)", parameter: "Pitch stops vibration",  scores: [10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ctrl_roll",        category: "Flight Controls (AP OFF)", parameter: "Roll stops vibration",   scores: [0,0,10,0,2,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ctrl_not_tried",   category: "Flight Controls (AP OFF)", parameter: "Not Tried",              scores: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ctrl_no_effect",   category: "Flight Controls (AP OFF)", parameter: "No Effect",              scores: [0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0] },
 ];
 
 const vibrationTypes = [
@@ -377,14 +379,9 @@ function VibrationModule() {
   const [vHistory, setVHistory] = useState("");
   const selectedMap = useMemo(() => computeSelectedMap(selectedRows), [selectedRows]);
   const totals = useMemo(() => {
-    const base = selectedRows.reduce((acc, row) => acc.map((v, i) => v + row.scores[i]), new Array(vibrationTypes.length).fill(0));
-    if ((selectedMap["Perception"] || []).includes("Rumbling") && (selectedMap["Affected Area"] || []).includes("Cockpit")) base[14] += 25;
-    if ((selectedMap["Flight Controls"] || []).includes("Roll")) base[2] += 6;
-    if ((selectedMap["Flight Controls"] || []).includes("Pitch")) base[0] += 6;
-    if ((selectedMap["Flight Controls"] || []).includes("Yaw")) base[4] += 6;
-    if ((selectedMap["Param Change"] || []).includes("Airbrakes Ext.")) base[0] += 6;
-    return base;
-  }, [selectedRows, selectedMap]);
+    return selectedRows.reduce((acc, row) => acc.map((v, i) => v + row.scores[i]), new Array(vibrationTypes.length).fill(0));
+  }, [selectedRows]);
+  // selectedMap used for future deferral logic only
   const ranking = useMemo(() => topThree(vibrationTypes, totals), [totals]);
   const best = ranking[0];
   return (
