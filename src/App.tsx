@@ -202,7 +202,7 @@ const apuInsp = {
   A:   ["APU 131-9(A): inspección Level A → AMM 49-00-00-200-812", "APU APS3200: inspección Level A → AMM 49-00-00-200-814"],
   B:   ["APU 131-9(A): inspección Level B/C → AMM 49-00-00-200-811", "APU APS3200: inspección Level B/C → AMM 49-00-00-200-816"],
   C:   ["APU 131-9(A): inspección Level B/C → AMM 49-00-00-200-811", "APU APS3200: inspección Level B/C → AMM 49-00-00-200-816"],
-  UNK: ["Nivel desconocido → aplicar Level B/C (conservador)", "APU 131-9(A): inspección Level B/C → AMM 49-00-00-200-811", "APU APS3200: inspección Level B/C → AMM 49-00-00-200-816"],
+  UNK: ["APU 131-9(A): inspección Level B/C → AMM 49-00-00-200-811", "APU APS3200: inspección Level B/C → AMM 49-00-00-200-816"],
 };
 
 function getOdorActions(typeId, level) {
