@@ -173,7 +173,7 @@ const odorRows = [
   { id: "dirty", category: "Odor Type", parameter: "Dirty Socks", scores: [3,3,3,0,2,2,0,0,0] },
   { id: "musty", category: "Odor Type", parameter: "Musty / Deicing Fluid", scores: [2,1,1,2,5,5,0,2,0] },
   { id: "oil", category: "Odor Type", parameter: "Oil / Acrid", scores: [5,5,5,2,0,0,1,0,0] },
-  { id: "smoke", category: "Odor Type", parameter: "Smoke / Burning Smell", scores: [0,0,0,0,0,0,0,0,70] },
+  { id: "smoke", category: "Odor Type", parameter: "Smoke / Burning Smell", scores: [0,0,0,0,0,0,0,0,25] },
   { id: "deice_yes", category: "De-Icing", parameter: "Yes, last 2 flights", scores: [3,3,3,6,3,3,0,12,0] },
 ];
 
@@ -528,10 +528,8 @@ function OdorModule() {
   const { selectedIds, selectedRows, toggle, reset } = useMultiSelect(odorRows);
   const selectedMap = useMemo(() => computeSelectedMap(selectedRows), [selectedRows]);
   const totals = useMemo(() => {
-    const base = selectedRows.reduce((acc, row) => acc.map((v, i) => v + row.scores[i]), new Array(odorTypes.length).fill(0));
-    if ((selectedMap["Odor Type"] || []).includes("Smoke / Burning Smell")) base[8] += 25;
-    return base;
-  }, [selectedRows, selectedMap]);
+    return selectedRows.reduce((acc, row) => acc.map((v, i) => v + row.scores[i]), new Array(odorTypes.length).fill(0));
+  }, [selectedRows]);
   const ranking = useMemo(() => topThree(odorTypes, totals), [totals]);
   const best = ranking[0];
   return (
