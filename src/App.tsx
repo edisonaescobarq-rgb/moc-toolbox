@@ -189,17 +189,75 @@ const odorTypes = [
   { id: 9, label: "T9", short: "Electrical", ref: "AMM 12-34-24 / 24-41-00" },
 ];
 
-const odorActions = {
-  1: ["APU odor / fumes inspection", "Apply ECS decontamination by event level"],
-  2: ["ENG 1 smoke / oil smell troubleshooting", "Apply ECS / bleed decontamination"],
-  3: ["ENG 2 smoke / oil smell troubleshooting", "Apply ECS / bleed decontamination"],
-  4: ["External / bird-strike inspection path"],
-  5: ["Pack 1 contamination / ECS path", "Apply decontamination"],
-  6: ["Pack 2 contamination / ECS path", "Apply decontamination"],
-  7: ["Hydraulic leak check", "Inspect inlet / intake if required"],
-  8: ["De-icing fluid ingestion path", "Apply Level A ECS decontamination"],
-  9: ["Electrical isolation / re-energization path", "Follow fire-risk precautions"],
+// ECS decontamination tasks by level (AMM 05-50-00-810-831-A Rev 52)
+const ecsDecon = {
+  A:   ["ECS descontaminación Level A → AMM 21-00-00-615-802"],
+  B:   ["ECS descontaminación Level B → AMM 21-00-00-615-803", "Bleed air ducts Level B → AMM 36-10-00-615-801"],
+  C:   ["ECS descontaminación Level C → AMM 21-00-00-615-804", "Bleed air ducts Level C → AMM 36-10-00-615-802"],
+  UNK: ["Nivel desconocido → aplicar Level C (conservador)", "ECS descontaminación Level C → AMM 21-00-00-615-804", "Bleed air ducts Level C → AMM 36-10-00-615-802"],
 };
+
+// APU inspection tasks by level
+const apuInsp = {
+  A:   ["APU 131-9(A): inspección Level A → AMM 49-00-00-200-812", "APU APS3200: inspección Level A → AMM 49-00-00-200-814"],
+  B:   ["APU 131-9(A): inspección Level B/C → AMM 49-00-00-200-811", "APU APS3200: inspección Level B/C → AMM 49-00-00-200-816"],
+  C:   ["APU 131-9(A): inspección Level B/C → AMM 49-00-00-200-811", "APU APS3200: inspección Level B/C → AMM 49-00-00-200-816"],
+  UNK: ["Nivel desconocido → aplicar Level B/C (conservador)", "APU 131-9(A): inspección Level B/C → AMM 49-00-00-200-811", "APU APS3200: inspección Level B/C → AMM 49-00-00-200-816"],
+};
+
+function getOdorActions(typeId, level) {
+  const lvl = level || "UNK";
+  switch(typeId) {
+    case 1: return [
+      "⚠ PREPARAR contacto con Bomberos — humo/fumes puede ser fuego",
+      ...apuInsp[lvl],
+      ...ecsDecon[lvl],
+    ];
+    case 2: return [
+      "⚠ PREPARAR contacto con Bomberos — humo/fumes puede ser fuego",
+      "ENG 1: smoke/oil smell → TASK 71-00-00-810-801-A / 71-00-00-810-802-A",
+      ...ecsDecon[lvl],
+    ];
+    case 3: return [
+      "⚠ PREPARAR contacto con Bomberos — humo/fumes puede ser fuego",
+      "ENG 2: smoke/oil smell → TASK 71-00-00-810-801-A / 71-00-00-810-802-A",
+      ...ecsDecon[lvl],
+    ];
+    case 4: return [
+      "Bird strike inspection → AMM 05-51-14-200-803",
+    ];
+    case 5: return [
+      "⚠ PREPARAR contacto con Bomberos — humo/fumes puede ser fuego",
+      "PACK 1: inspección APU según tipo instalado",
+      ...apuInsp[lvl],
+      ...ecsDecon[lvl],
+    ];
+    case 6: return [
+      "⚠ PREPARAR contacto con Bomberos — humo/fumes puede ser fuego",
+      "PACK 2: inspección APU según tipo instalado",
+      ...apuInsp[lvl],
+      ...ecsDecon[lvl],
+    ];
+    case 7: return [
+      "Check external leaks hydraulic components → AMM 29-00-00-790-001",
+      "GVI APU air-inlet plenum y APU air intake → AMM 49-16-00-210-802/805",
+    ];
+    case 8: return [
+      "De-icing fluid ingestion: GVI APU air-inlet plenum → AMM 49-16-00-210-802/805",
+      "ECS descontaminación Level A → AMM 21-00-00-615-802",
+    ];
+    case 9: return [
+      "⚠ PREPARAR contacto con Bomberos — causa eléctrica puede reiniciar fuego al energizar",
+      "⚠ DOS PERSONAS requeridas: una en cabina, una monitoreando humo/fuego",
+      "Ground aircraft → AMM 12-34-24-869-002",
+      "De-energizar circuitos eléctricos → AMM 24-41-00-862-002",
+      "Verificar circuit breakers — si hay disparados, aplicar TSM correspondiente",
+      "Identificar causa en área visible; si no: remover paneles y activar CB uno a uno",
+      "Energizar → AMM 24-41-00-861-002 (External Power)",
+    ];
+    default: return ["Consultar AMM 05-50-00-810-831-A Rev 52"];
+  }
+}
 
 const odorLevels = [
   { id: "A", label: "Level A", note: "Temporary odor" },
@@ -574,9 +632,10 @@ function OdorModule() {
             {best && best.total > 0 ? (
               <div>
                 <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "#d97706", marginBottom: 10 }}>Primary: {best.short}</div>
-                {(odorActions[best.id] || []).map((a, i) => (
-                  <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, padding: "8px 10px", background: "var(--surface2)", borderRadius: 6, fontSize: 12, fontFamily: "var(--mono)", color: "var(--text2)", borderLeft: "3px solid #d97706" }}>
-                    <span style={{ color: "#d97706" }}>→</span> {a}
+                {getOdorActions(best.id, eventLevel).map((a, i) => (
+                  <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, padding: "8px 10px", background: a.startsWith("⚠") ? "rgba(220,38,38,0.06)" : "var(--surface2)", borderRadius: 6, fontSize: 11, fontFamily: "var(--mono)", color: a.startsWith("⚠") ? "var(--red)" : "var(--text2)", borderLeft: `3px solid ${a.startsWith("⚠") ? "var(--red)" : "#d97706"}` }}>
+                    <span style={{ color: a.startsWith("⚠") ? "var(--red)" : "#d97706", flexShrink: 0 }}>{a.startsWith("⚠") ? "⚠" : "→"}</span>
+                    <span>{a.startsWith("⚠") ? a.slice(2) : a}</span>
                   </div>
                 ))}
               </div>
