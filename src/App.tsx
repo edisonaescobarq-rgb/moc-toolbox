@@ -456,6 +456,15 @@ function VibrationModule() {
                 ))}
               </div>
             </div>
+            {(selectedIds.includes("intensity_strong") || selectedIds.includes("perception_rumbling")) && (
+              <div style={{ marginBottom: 12, padding: "10px 14px", background: "rgba(220,38,38,0.07)", border: "1.5px solid var(--red)", borderRadius: 8, display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <span style={{ color: "var(--red)", fontSize: 16, flexShrink: 0 }}>⚠</span>
+                <div>
+                  <div style={{ fontFamily: "var(--mono)", fontSize: 11, fontWeight: 700, color: "var(--red)", marginBottom: 3 }}>Strong Vibration / Rumbling — Acción inmediata</div>
+                  <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text2)" }}>El VRS indica <b>Strong Vibration</b> o <b>Rumbling Noise</b> → Contactar <b>Engineering PSE (SCL)</b> directamente antes de diferir.</div>
+                </div>
+              </div>
+            )}
             {vStation && vHistory ? (() => {
               const isMain  = vStation === "main";
               const hasHist = vHistory === "yes";
