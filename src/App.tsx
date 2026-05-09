@@ -398,6 +398,7 @@ function HomeScreen({ setScreen }) {
     { key: "odor", icon: "◎", label: "Odor / Smoke", sub: "Source Detection", color: "#d97706" },
     { key: "aog", icon: "⚡", label: "AOG Workflow", sub: "Email Generator", color: "#dc2626" },
     { key: "directorio", icon: "📞", label: "Directorio", sub: "Contactos MOC SSC", color: "#0891b2" },
+    { key: "oil", icon: "🛢", label: "Oil Consumption", sub: "Engine Oil Tracking", color: "#16a34a" },
     { key: "mel", icon: "📘", label: "MEL", sub: "Coming Soon", color: "#8fa0b8", disabled: true },
   ];
   return (
@@ -3976,6 +3977,287 @@ const DIRECTORIO = {
   ]
 };
 
+// ─────────────────────────────────────────────
+// OIL CONSUMPTION MODULE
+// ─────────────────────────────────────────────
+const OIL_ENGINES = [
+  { id: "V2500", label: "V2500",  limit: 0.30, ref: "AMM TASK 71-00-00-860-010-B" },
+  { id: "CFM56", label: "CFM56",  limit: 0.60, ref: "AMM TASK 72-00-00-200-008-A" },
+  { id: "PWNEO", label: "PW NEO", limit: 0.20, ref: "AMM TASK 71-00-00-910-803-A" },
+  { id: "RR",    label: "R/R",    limit: 0.63, ref: "DMC-B787-A-R71-00-00-07A-030A-A" },
+  { id: "CF6",   label: "CF6",    limit: 0.25, ref: "AMM TASK 71-00-00-862-020-H03" },
+];
+
+function parseOilTS(s: string): Date | null {
+  if (!s || !s.trim()) return null;
+  const months: Record<string,number> = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+  const m = s.trim().match(/(\d{2})-([A-Z]{3})-(\d{4})\s+(\d{2}):(\d{2})/);
+  if (!m) return null;
+  return new Date(Date.UTC(+m[3], months[m[2]], +m[1], +m[4], +m[5]));
+}
+
+interface OilFlight {
+  name: string; dep: string; arr: string;
+  depActual: Date; arrActual: Date;
+  blockHrs: number; oil1: number; oil2: number;
+}
+
+const OIL_SAMPLE = `LA425\tLA425\tCOMPLETE\tSCL\t07-MAY-2026 20:37 UTC\t07-MAY-2026 20:31 UTC\tAEP\t07-MAY-2026 22:40 UTC\t07-MAY-2026 22:38 UTC
+LA115\tLA115\tCOMPLETE\tCPO\t07-MAY-2026 18:33 UTC\t07-MAY-2026 18:24 UTC\tSCL\t07-MAY-2026 19:51 UTC\t07-MAY-2026 19:47 UTC
+LA328\tLA328\tCOMPLETE\tSCL\t07-MAY-2026 16:11 UTC\t07-MAY-2026 16:00 UTC\tCPO\t07-MAY-2026 17:43 UTC\t07-MAY-2026 17:22 UTC
+LA016\tLA016\tCOMPLETE\tCCP\t07-MAY-2026 14:19 UTC\t07-MAY-2026 14:10 UTC\tSCL\t07-MAY-2026 15:15 UTC\t07-MAY-2026 15:15 UTC
+LA015\tLA015\tCOMPLETE\tSCL\t07-MAY-2026 12:30 UTC\t07-MAY-2026 12:22 UTC\tCCP\t07-MAY-2026 13:39 UTC\t07-MAY-2026 13:29 UTC
+LA775\tLA775\tCOMPLETE\tGIG\t06-MAY-2026 16:40 UTC\t06-MAY-2026 16:31 UTC\tSCL\t06-MAY-2026 21:30 UTC\t06-MAY-2026 23:14 UTC
+LA774\tLA774\tCOMPLETE\tSCL\t06-MAY-2026 11:35 UTC\t06-MAY-2026 11:35 UTC\tGIG\t06-MAY-2026 15:40 UTC\t06-MAY-2026 15:33 UTC
+LA411\tLA411\tCOMPLETE\tMVD\t05-MAY-2026 22:21 UTC\t05-MAY-2026 22:18 UTC\tSCL\t06-MAY-2026 00:59 UTC\t06-MAY-2026 00:50 UTC
+LA410\tLA410\tCOMPLETE\tSCL\t05-MAY-2026 19:06 UTC\t05-MAY-2026 19:05 UTC\tMVD\t05-MAY-2026 21:31 UTC\t05-MAY-2026 21:31 UTC
+LA036\tLA036\tCOMPLETE\tZCO\t05-MAY-2026 16:49 UTC\t05-MAY-2026 16:34 UTC\tSCL\t05-MAY-2026 18:12 UTC\t05-MAY-2026 18:04 UTC
+LA025\tLA025\tCOMPLETE\tSCL\t05-MAY-2026 14:43 UTC\t05-MAY-2026 14:36 UTC\tZCO\t05-MAY-2026 16:03 UTC\t05-MAY-2026 16:03 UTC
+LA141\tLA141\tCOMPLETE\tCJC\t05-MAY-2026 11:27 UTC\t05-MAY-2026 11:27 UTC\tSCL\t05-MAY-2026 13:30 UTC\t05-MAY-2026 13:30 UTC
+LA140\tLA140\tCOMPLETE\tSCL\t05-MAY-2026 08:32 UTC\t05-MAY-2026 08:34 UTC\tCJC\t05-MAY-2026 10:41 UTC\t05-MAY-2026 10:38 UTC
+LA1988\tLA1988\tCOMPLETE\tGRU\t05-MAY-2026 02:50 UTC\t05-MAY-2026 03:02 UTC\tSCL\t05-MAY-2026 07:00 UTC\t05-MAY-2026 07:34 UTC
+LA3463\tLA3463\tCOMPLETE\tLDB\t04-MAY-2026 22:20 UTC\t04-MAY-2026 22:34 UTC\tGRU\t04-MAY-2026 23:35 UTC\t04-MAY-2026 23:57 UTC
+LA8049\tLA8049\tCOMPLETE\tCOR\t04-MAY-2026 16:20 UTC\t04-MAY-2026 16:24 UTC\tGRU\t04-MAY-2026 19:25 UTC\t04-MAY-2026 19:25 UTC
+LA8048\tLA8048\tCOMPLETE\tGRU\t04-MAY-2026 12:10 UTC\t04-MAY-2026 12:16 UTC\tCOR\t04-MAY-2026 15:30 UTC\t04-MAY-2026 15:45 UTC
+LA3199\tLA3199\tCOMPLETE\tMCZ\t04-MAY-2026 05:55 UTC\t04-MAY-2026 06:10 UTC\tGRU\t04-MAY-2026 08:55 UTC\t04-MAY-2026 09:12 UTC
+LA3198\tLA3198\tCOMPLETE\tGRU\t04-MAY-2026 02:10 UTC\t04-MAY-2026 02:46 UTC\tMCZ\t04-MAY-2026 05:30 UTC\t04-MAY-2026 05:30 UTC
+LA3411\tLA3411\tCOMPLETE\tNVT\t03-MAY-2026 22:55 UTC\t03-MAY-2026 22:42 UTC\tGRU\t04-MAY-2026 00:20 UTC\t04-MAY-2026 00:08 UTC`;
+
+function parseOilFlights(raw: string): OilFlight[] {
+  const rows = raw.trim().split('\n').map(r => r.split('\t').map(c => c.trim()));
+  const result: OilFlight[] = [];
+  for (const cols of rows) {
+    if (cols.length < 9) continue;
+    if (cols[0].toUpperCase().includes('NAME') || cols[0].toUpperCase().includes('VUELO')) continue;
+    const depA = parseOilTS(cols[5]);
+    const arrA = parseOilTS(cols[8]);
+    if (!depA || !arrA) continue;
+    const blockMs = arrA.getTime() - depA.getTime();
+    if (blockMs <= 0) continue;
+    result.push({ name: cols[0], dep: cols[3], arr: cols[6], depActual: depA, arrActual: arrA, blockHrs: blockMs / 3600000, oil1: 0, oil2: 0 });
+  }
+  return result;
+}
+
+function fmtUTC(d: Date) {
+  return d.toISOString().replace('T',' ').slice(0,16) + ' UTC';
+}
+
+function OilModule() {
+  const [pasteVal, setPasteVal] = useState("");
+  const [flights, setFlights] = useState<OilFlight[]>([]);
+  const [engId, setEngId] = useState("V2500");
+  const [status, setStatus] = useState<{msg:string,ok:boolean}|null>(null);
+
+  const eng = OIL_ENGINES.find(e => e.id === engId)!;
+
+  const doParseFlights = (raw: string) => {
+    const parsed = parseOilFlights(raw);
+    if (parsed.length === 0) { setStatus({msg:"Could not parse any valid flights",ok:false}); return; }
+    setFlights(parsed);
+    setStatus({msg:`✓ ${parsed.length} flights loaded`,ok:true});
+  };
+
+  const loadSample = () => {
+    setPasteVal(OIL_SAMPLE);
+    const parsed = parseOilFlights(OIL_SAMPLE);
+    const sampleOil = [0,0,0.5,0,0.5,0,1,0.5,0,0.5,0,0.5,0,0,0.5,0,0.5,0,0,0.5];
+    parsed.forEach((f,i) => { f.oil1 = sampleOil[i]||0; f.oil2 = sampleOil[i]||0; });
+    setFlights(parsed);
+    setStatus({msg:`✓ ${parsed.length} sample flights loaded`,ok:true});
+  };
+
+  const updateOil = (idx: number, eng: 1|2, val: string) => {
+    const v = parseFloat(val) || 0;
+    setFlights(prev => prev.map((f,i) => i===idx ? {...f, [eng===1?'oil1':'oil2']: v} : f));
+  };
+
+  // Compute cumulative
+  const computed = useMemo(() => {
+    let ch=0, co1=0, co2=0;
+    return flights.map((f,i) => {
+      ch += f.blockHrs; co1 += f.oil1; co2 += f.oil2;
+      return {...f, fc:i+1, cumulHrs:ch, cumulOil1:co1, cumulOil2:co2};
+    });
+  }, [flights]);
+
+  const fh25idx = useMemo(() => {
+    for (let i=0; i<computed.length; i++) if (computed[i].cumulHrs >= 25) return i;
+    return computed.length - 1;
+  }, [computed]);
+
+  function rateColor(r: number) {
+    if (r === 0) return "var(--text3)";
+    if (r > eng.limit) return "var(--red)";
+    if (r > eng.limit * 0.8) return "var(--amber)";
+    return "var(--green)";
+  }
+  function rateStatus(r: number) {
+    if (r === 0) return "";
+    if (r > eng.limit) return "⚠ OVER LIMIT";
+    if (r > eng.limit * 0.8) return "△ NEAR LIMIT";
+    return "✓ OK";
+  }
+  function barPct(r: number) { return Math.min(100, eng.limit > 0 ? (r/eng.limit)*100 : 0); }
+
+  const periods = [
+    { label:"10 FC", desc:"First 10 Flight Cycles", color:"var(--accent)", idx: Math.min(9, computed.length-1) },
+    { label:"20 FC", desc:"First 20 Flight Cycles", color:"var(--green)", idx: Math.min(19, computed.length-1) },
+    { label:"25 FH ★", desc:"Accumulated to 25 FH", color:"var(--amber)", idx: fh25idx },
+  ];
+
+  const cardSt = { background:"var(--surface)", border:"1.5px solid var(--border)", borderRadius:10, overflow:"hidden" as const, marginBottom:16 };
+  const hdrSt = { padding:"10px 16px", borderBottom:"1px solid var(--border2)", fontFamily:"var(--mono)", fontSize:10, fontWeight:700, color:"var(--text2)", textTransform:"uppercase" as const, letterSpacing:"0.1em", display:"flex", alignItems:"center", gap:8 };
+  const dot = (c:string) => <span style={{width:6,height:6,borderRadius:"50%",background:c,display:"inline-block"}} />;
+
+  return (
+    <div style={{padding:"20px 24px",maxWidth:1400,margin:"0 auto"}} className="fadeIn">
+      <div style={{marginBottom:20}}>
+        <div style={{fontFamily:"var(--mono)",fontSize:10,color:"#16a34a",letterSpacing:"0.12em",marginBottom:4}}>// OIL CONSUMPTION · ENGINE MONITORING</div>
+        <h2 style={{fontFamily:"var(--sans)",fontWeight:800,fontSize:24,color:"var(--text)"}}>Oil Consumption Tool</h2>
+      </div>
+
+      {/* STEP 1 — PASTE */}
+      <div style={cardSt}>
+        <div style={hdrSt}>{dot("var(--accent)")} STEP 1 — PASTE FLIGHT DATA</div>
+        <div style={{padding:16}}>
+          <div style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--text3)",marginBottom:8}}>Paste exported data (NAME · MASTER · STATUS · DEP · DEP SCHED · DEP ACTUAL · ARR · ARR SCHED · ARR ACTUAL)</div>
+          <textarea value={pasteVal} onChange={e => setPasteVal(e.target.value)}
+            placeholder={"LA425\tLA425\tCOMPLETE\tSCL\t07-MAY-2026 20:37 UTC\t07-MAY-2026 20:31 UTC\tAEP\t07-MAY-2026 22:40 UTC\t07-MAY-2026 22:38 UTC"}
+            style={{width:"100%",height:100,background:"var(--bg)",border:"1.5px solid var(--border)",borderRadius:8,color:"var(--text)",fontFamily:"var(--mono)",fontSize:11,padding:"10px 12px",resize:"vertical",outline:"none",lineHeight:1.6}} />
+          <div style={{display:"flex",gap:8,marginTop:10,alignItems:"center"}}>
+            <button onClick={() => doParseFlights(pasteVal)} style={{padding:"6px 14px",borderRadius:6,border:"none",cursor:"pointer",fontFamily:"var(--mono)",fontSize:11,fontWeight:600,background:"var(--accent2)",color:"white"}}>▶ Load Flights</button>
+            <button onClick={loadSample} style={{padding:"6px 14px",borderRadius:6,border:"1.5px solid var(--border)",cursor:"pointer",fontFamily:"var(--mono)",fontSize:11,background:"var(--surface2)",color:"var(--text2)"}}>Load Sample</button>
+            <button onClick={() => { setFlights([]); setPasteVal(""); setStatus(null); }} style={{padding:"6px 14px",borderRadius:6,border:"1.5px solid rgba(248,81,73,0.3)",cursor:"pointer",fontFamily:"var(--mono)",fontSize:11,background:"rgba(248,81,73,0.1)",color:"var(--red)"}}>↺ Clear</button>
+            {status && <span style={{fontFamily:"var(--mono)",fontSize:10,color:status.ok?"var(--green)":"var(--red)"}}>{status.msg}</span>}
+          </div>
+        </div>
+      </div>
+
+      {flights.length > 0 && (<>
+
+      {/* STEP 2 — ENGINE */}
+      <div style={cardSt}>
+        <div style={hdrSt}>{dot("var(--amber)")} STEP 2 — ENGINE TYPE &amp; LIMITS</div>
+        <div style={{padding:"10px 16px",borderBottom:"1px solid var(--border2)",display:"flex",alignItems:"center",gap:16,flexWrap:"wrap" as const}}>
+          <span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--text3)",textTransform:"uppercase" as const,letterSpacing:"0.08em"}}>Select engine:</span>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap" as const}}>
+            {OIL_ENGINES.map(e => (
+              <button key={e.id} onClick={() => setEngId(e.id)}
+                style={{padding:"4px 10px",borderRadius:5,border:"1.5px solid",cursor:"pointer",fontFamily:"var(--mono)",fontSize:10,
+                  borderColor: e.id===engId ? "var(--accent)" : "var(--border)",
+                  background: e.id===engId ? "rgba(88,166,255,0.12)" : "transparent",
+                  color: e.id===engId ? "var(--accent)" : "var(--text2)"}}>
+                {e.label}
+              </button>
+            ))}
+          </div>
+          <span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--text3)",marginLeft:"auto"}}>Limit: <span style={{color:"var(--amber)"}}>{eng.limit.toFixed(2)} QTS/HR</span></span>
+        </div>
+        <div style={{padding:"8px 16px"}}>
+          <table style={{width:"100%",borderCollapse:"collapse" as const,fontFamily:"var(--mono)",fontSize:11}}>
+            <thead><tr>{["Engine","Limit (QTS/HR)","AMM Reference"].map(h=><th key={h} style={{padding:"6px 10px",textAlign:"left" as const,color:"var(--text3)",fontSize:9,textTransform:"uppercase" as const,letterSpacing:"0.08em",borderBottom:"1px solid var(--border2)"}}>{h}</th>)}</tr></thead>
+            <tbody>{OIL_ENGINES.map(e=><tr key={e.id} style={{background:e.id===engId?"rgba(88,166,255,0.06)":"transparent"}}>
+              <td style={{padding:"7px 10px",color:e.id===engId?"var(--accent)":"var(--text)",fontWeight:e.id===engId?700:400,borderBottom:"1px solid var(--border2)"}}>{e.label}{e.id===engId?" ◀":""}</td>
+              <td style={{padding:"7px 10px",color:"var(--amber)",fontFamily:"var(--mono)",borderBottom:"1px solid var(--border2)"}}>{e.limit.toFixed(2)}</td>
+              <td style={{padding:"7px 10px",color:"var(--text3)",fontSize:10,borderBottom:"1px solid var(--border2)"}}>{e.ref}</td>
+            </tr>)}</tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* STEP 3 — TABLE */}
+      <div style={cardSt}>
+        <div style={hdrSt}>{dot("var(--green)")} STEP 3 — ENTER OIL ADDED PER FLIGHT</div>
+        <div style={{overflowX:"auto" as const}}>
+          <table style={{width:"100%",borderCollapse:"collapse" as const,fontFamily:"var(--mono)",fontSize:11}}>
+            <thead>
+              <tr style={{background:"var(--surface2)",borderBottom:"1px solid var(--border)"}}>
+                {["#","FLIGHT","ROUTE","DEP ACTUAL (UTC)","ARR ACTUAL (UTC)","BLOCK HRS","CUMUL HRS","OIL ENG1 (QTS)","OIL ENG2 (QTS)","CUMUL ENG1","CUMUL ENG2","PERIOD"].map((h,i)=>(
+                  <th key={i} style={{padding:"8px 10px",textAlign:["BLOCK HRS","CUMUL HRS","CUMUL ENG1","CUMUL ENG2"].includes(h)?"right" as const:["OIL ENG1 (QTS)","OIL ENG2 (QTS)","PERIOD"].includes(h)?"center" as const:"left" as const,color:"var(--text3)",fontWeight:500,fontSize:9,textTransform:"uppercase" as const,letterSpacing:"0.08em",whiteSpace:"nowrap" as const}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {computed.map((f,i) => {
+                const is10 = f.fc === 10;
+                const is20 = f.fc === 20;
+                const is25 = i === fh25idx;
+                return (
+                  <tr key={i} style={{borderBottom:"1px solid var(--border2)"}}>
+                    <td style={{padding:"7px 10px",color:"var(--text3)",fontSize:10}}>{f.fc}</td>
+                    <td style={{padding:"7px 10px",color:"var(--text)",fontWeight:500}}>{f.name}</td>
+                    <td style={{padding:"7px 10px",color:"var(--text3)",fontSize:10}}>{f.dep}→{f.arr}</td>
+                    <td style={{padding:"7px 10px",color:"var(--text3)",fontSize:10}}>{fmtUTC(f.depActual)}</td>
+                    <td style={{padding:"7px 10px",color:"var(--text3)",fontSize:10}}>{fmtUTC(f.arrActual)}</td>
+                    <td style={{padding:"7px 10px",textAlign:"right" as const,color:"var(--text)"}}>{f.blockHrs.toFixed(2)}</td>
+                    <td style={{padding:"7px 10px",textAlign:"right" as const,color:"var(--text3)"}}>{f.cumulHrs.toFixed(2)}</td>
+                    <td style={{padding:"7px 10px",textAlign:"center" as const}}>
+                      <input type="number" min={0} step={0.1} defaultValue={f.oil1||""} placeholder="0.0"
+                        onChange={e => updateOil(i,1,e.target.value)}
+                        style={{width:64,background:"var(--bg)",border:"1.5px solid var(--border)",borderRadius:4,color:"var(--text)",fontFamily:"var(--mono)",fontSize:11,padding:"3px 6px",textAlign:"right" as const,outline:"none"}} />
+                    </td>
+                    <td style={{padding:"7px 10px",textAlign:"center" as const}}>
+                      <input type="number" min={0} step={0.1} defaultValue={f.oil2||""} placeholder="0.0"
+                        onChange={e => updateOil(i,2,e.target.value)}
+                        style={{width:64,background:"var(--bg)",border:"1.5px solid var(--border)",borderRadius:4,color:"var(--text)",fontFamily:"var(--mono)",fontSize:11,padding:"3px 6px",textAlign:"right" as const,outline:"none"}} />
+                    </td>
+                    <td style={{padding:"7px 10px",textAlign:"right" as const,color:"var(--text2)"}}>{f.cumulOil1.toFixed(2)}</td>
+                    <td style={{padding:"7px 10px",textAlign:"right" as const,color:"var(--text2)"}}>{f.cumulOil2.toFixed(2)}</td>
+                    <td style={{padding:"7px 10px",textAlign:"center" as const}}>
+                      {is10 && <span style={{display:"inline-block",padding:"1px 6px",borderRadius:3,fontSize:9,fontWeight:700,background:"rgba(88,166,255,0.15)",color:"var(--accent)",border:"1px solid rgba(88,166,255,0.3)"}}>10FC</span>}
+                      {is20 && <span style={{display:"inline-block",padding:"1px 6px",borderRadius:3,fontSize:9,fontWeight:700,background:"rgba(63,185,80,0.12)",color:"var(--green)",border:"1px solid rgba(63,185,80,0.3)",marginLeft:2}}>20FC</span>}
+                      {is25 && <span style={{display:"inline-block",padding:"1px 6px",borderRadius:3,fontSize:9,fontWeight:700,background:"rgba(210,153,34,0.15)",color:"var(--amber)",border:"1px solid rgba(210,153,34,0.3)",marginLeft:2}}>25FH</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* STEP 4 — SUMMARY */}
+      <div style={cardSt}>
+        <div style={hdrSt}>{dot("var(--red)")} CONSUMPTION SUMMARY — <span style={{color:"var(--amber)"}}>{eng.label} · Limit {eng.limit.toFixed(2)} QTS/HR</span></div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,padding:16}}>
+          {periods.map(p => {
+            const d = computed[p.idx];
+            if (!d) return null;
+            const r1 = d.cumulHrs > 0 ? d.cumulOil1/d.cumulHrs : 0;
+            const r2 = d.cumulHrs > 0 ? d.cumulOil2/d.cumulHrs : 0;
+            const hasOil = d.cumulOil1 > 0 || d.cumulOil2 > 0;
+            return (
+              <div key={p.label} style={{background:"var(--surface2)",border:"1.5px solid var(--border2)",borderRadius:8,padding:14}}>
+                <div style={{fontFamily:"var(--mono)",fontSize:9,color:p.color,textTransform:"uppercase" as const,letterSpacing:"0.1em",marginBottom:4}}>{p.label}</div>
+                <div style={{fontFamily:"var(--mono)",fontSize:11,color:"var(--text2)",marginBottom:4}}>{p.desc}</div>
+                <div style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--text3)",marginBottom:10}}>{p.idx+1} FC · {d.cumulHrs.toFixed(2)} BLK HRS · Limit: {eng.limit.toFixed(2)} QTS/HR</div>
+                {[{label:"ENG 1",rate:r1,oil:d.cumulOil1},{label:"ENG 2",rate:r2,oil:d.cumulOil2}].map(e => (
+                  <div key={e.label} style={{marginBottom:10}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}>
+                      <span style={{fontFamily:"var(--mono)",fontSize:10,color:"var(--text3)"}}>{e.label}</span>
+                      <div style={{display:"flex",alignItems:"baseline",gap:4}}>
+                        <span style={{fontFamily:"var(--mono)",fontSize:18,fontWeight:500,color:hasOil&&e.rate>0?rateColor(e.rate):"var(--text3)"}}>{hasOil&&e.rate>0?e.rate.toFixed(3):"—"}</span>
+                        <span style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--text3)"}}>QTS/HR</span>
+                      </div>
+                    </div>
+                    <div style={{height:3,background:"var(--border)",borderRadius:2,marginTop:4,overflow:"hidden" as const}}>
+                      <div style={{height:"100%",borderRadius:2,width:`${hasOil?barPct(e.rate):0}%`,background:rateColor(e.rate),transition:"width 0.4s"}} />
+                    </div>
+                    {hasOil && e.rate > 0 && <div style={{fontFamily:"var(--mono)",fontSize:9,color:"var(--text3)",marginTop:3}}>{e.oil.toFixed(2)} QTS / {d.cumulHrs.toFixed(2)} HRS <span style={{color:rateColor(e.rate)}}>{rateStatus(e.rate)}</span></div>}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      </>)}
+    </div>
+  );
+}
+
 function DirectorioModule() {
   const sections = Object.keys(DIRECTORIO);
   const [active, setActive] = useState(sections[0]);
@@ -4047,11 +4329,12 @@ export default function App() {
       <style>{CSS}</style>
       <div style={{ minHeight:"100vh", background:"var(--bg)" }}>
         <Header screen={screen} setScreen={setScreen} />
-        {screen === "home"      && <HomeScreen setScreen={setScreen} />}
-        {screen === "vibration" && <VibrationModule />}
-        {screen === "odor"      && <OdorModule />}
-        {screen === "aog"       && <AOGModule />}
+        {screen === "home"       && <HomeScreen setScreen={setScreen} />}
+        {screen === "vibration"  && <VibrationModule />}
+        {screen === "odor"       && <OdorModule />}
+        {screen === "aog"        && <AOGModule />}
         {screen === "directorio" && <DirectorioModule />}
+        {screen === "oil"        && <OilModule />}
       </div>
     </>
   );
