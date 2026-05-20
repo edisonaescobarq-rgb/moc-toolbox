@@ -399,6 +399,7 @@ function HomeScreen({ setScreen }) {
     { key: "aog", icon: "⚡", label: "AOG Workflow", sub: "Email Generator", color: "#dc2626" },
     { key: "directorio", icon: "📞", label: "Directorio", sub: "Contactos MOC SSC", color: "#0891b2" },
     { key: "oil", icon: "🛢", label: "Oil Consumption", sub: "Engine Oil Tracking", color: "#16a34a" },
+    { key: "birdstrike", icon: "🐦", label: "Bird Strike", sub: "A320 Checklist AMM", color: "#7c3aed" },
     { key: "mel", icon: "📘", label: "MEL", sub: "Coming Soon", color: "#8fa0b8", disabled: true },
   ];
   return (
@@ -4043,6 +4044,28 @@ function fmtUTC(d: Date) {
   return d.toISOString().replace('T',' ').slice(0,16) + ' UTC';
 }
 
+// ─────────────────────────────────────────────
+// BIRD STRIKE MODULE
+// ─────────────────────────────────────────────
+function BirdStrikeModule() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 56px)" }}>
+      <div style={{ padding: "12px 24px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--surface)" }}>
+        <div>
+          <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "#7c3aed", letterSpacing: "0.12em", marginBottom: 2 }}>// BIRD STRIKE · CHECKLIST AMM</div>
+          <div style={{ fontFamily: "var(--sans)", fontSize: 16, fontWeight: 800, color: "var(--text)" }}>🐦 Bird Strike — A320 Family</div>
+        </div>
+        <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)" }}>AMM 05-51-14-200-803-A · Rev 52 · V2500 + GTF + CFM56</div>
+      </div>
+      <iframe
+        src="/birdstrike.html"
+        style={{ flex: 1, border: "none", width: "100%" }}
+        title="Bird Strike Checklist"
+      />
+    </div>
+  );
+}
+
 function OilModule() {
   const [pasteVal, setPasteVal] = useState("");
   const [flights, setFlights] = useState<OilFlight[]>([]);
@@ -4335,6 +4358,7 @@ export default function App() {
         {screen === "aog"        && <AOGModule />}
         {screen === "directorio" && <DirectorioModule />}
         {screen === "oil"        && <OilModule />}
+        {screen === "birdstrike" && <BirdStrikeModule />}
       </div>
     </>
   );

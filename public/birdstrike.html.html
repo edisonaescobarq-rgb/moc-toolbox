@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)file:///C:/Users/ediso/Downloads/birdstrike.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bird Strike — A320 Family</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;font-size:14px}
+.hdr{background:linear-gradient(135deg,#0f3460,#16213e);border-bottom:3px solid #e94560;padding:14px 16px}
+.hdr h1{font-size:1.05rem;font-weight:800;color:#fff}
+.hdr p{font-size:0.68rem;color:#aaa;margin-top:2px}
+.warn-bar{background:#3d0000;border-left:5px solid #ff3333;margin:10px;padding:10px 14px;border-radius:6px;font-size:0.74rem;color:#ffaaaa;line-height:1.5}
+.mental{margin:0 10px 10px;padding:10px 14px;border-radius:8px;background:#0f1f3a;border-left:4px solid #4fc3f7;font-size:0.75rem;color:#90caf9;line-height:1.5}
+.mental b{color:#4fc3f7}
+.banner{margin:10px;padding:12px 16px;border-radius:10px;border:2px solid transparent;display:none}
+.banner.show{display:flex;gap:14px;align-items:center}
+.banner.minor{background:#001a10;border-color:#2e7d32}.banner.minor h2{color:#69f0ae}
+.banner.moderate{background:#1a1200;border-color:#f9a825}.banner.moderate h2{color:#ffd740}
+.banner.major{background:#1f0000;border-color:#e53935}.banner.major h2{color:#ff5252}
+.bi{font-size:2rem;flex-shrink:0}.bb h2{font-size:0.95rem;font-weight:800}.bb p{font-size:0.72rem;color:#aaa;margin-top:3px;line-height:1.4}
+.prog{margin:8px 10px}.prog-lbl{display:flex;justify-content:space-between;font-size:0.7rem;color:#888;margin-bottom:3px}
+.prog-bg{background:#0f1f3a;border-radius:6px;height:6px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#e94560,#4fc3f7);border-radius:6px;transition:width 0.3s;width:0%}
+.sec{margin:10px;background:#16213e;border-radius:10px;overflow:hidden;border:1px solid #2a3f6f}
+.sec.gtf{border-color:#5c3a00}.sec.v25{border-color:#1a3a5c}.sec.cfm{border-color:#1a3a20}
+.dimmed{opacity:0.35;pointer-events:none;filter:grayscale(0.5)}
+.dimmed *{pointer-events:none}
+.sec.res.minor{border-color:#2e7d32}.sec.res.moderate{border-color:#f9a825}.sec.res.major{border-color:#e53935}
+.sh{display:flex;align-items:center;gap:10px;padding:10px 14px;background:linear-gradient(90deg,#0f3460,#16213e);cursor:pointer;user-select:none}
+.sec.gtf .sh{background:linear-gradient(90deg,#3d1f00,#1e1500)}
+.sec.cfm .sh{background:linear-gradient(90deg,#0d2810,#16213e)}
+.sec.v25 .sh{background:linear-gradient(90deg,#0d2a40,#16213e)}
+.sec.res.minor .sh{background:linear-gradient(90deg,#003300,#16213e)}
+.sec.res.moderate .sh{background:linear-gradient(90deg,#2a2000,#16213e)}
+.sec.res.major .sh{background:linear-gradient(90deg,#3d0000,#16213e)}
+.sn{width:26px;height:26px;border-radius:50%;background:#e94560;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;color:#fff;flex-shrink:0}
+.sec.gtf .sn{background:#e65100}.sec.v25 .sn{background:#0d47a1}.sec.cfm .sn{background:#1b5e20}
+.sec.res.minor .sn{background:#2e7d32}.sec.res.moderate .sn{background:#f9a825;color:#000}.sec.res.major .sn{background:#e53935}
+.st{font-size:0.86rem;font-weight:700;color:#4fc3f7;flex:1}
+.sec.gtf .st{color:#ffab40}.sec.v25 .st{color:#64b5f6}.sec.cfm .st{color:#69f0ae}
+.sec.res.minor .st{color:#69f0ae}.sec.res.moderate .st{color:#ffd740}.sec.res.major .st{color:#ff5252}
+.sa{color:#666;font-size:0.75rem}
+.sb{display:none;padding:0 14px 14px}.sb.open{display:block}
+.sl{font-size:0.7rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;padding:8px 0 4px;border-top:1px solid #1a2540;margin-top:4px}
+.sl:first-child{border-top:none}
+.qr{border-bottom:1px solid #1a2540;padding:9px 0;display:flex;flex-direction:column;gap:5px}
+.qr:last-child{border-bottom:none}
+.qt{font-size:0.81rem;color:#ddd;line-height:1.4}.qt b{color:#ffcc00}
+.qref{font-size:0.67rem;color:#666;margin-top:1px}
+.yw{display:flex;gap:6px;margin-top:3px;flex-wrap:wrap;align-items:center}
+.yb{padding:5px 14px;border-radius:20px;font-size:0.74rem;font-weight:700;border:2px solid transparent;cursor:pointer;transition:all 0.15s;background:transparent}
+.yb.yes{border-color:#388e3c;color:#81c784}.yb.yes.on{background:#388e3c;color:#fff}
+.yb.no{border-color:#c62828;color:#ef9a9a}.yb.no.on{background:#c62828;color:#fff}
+.yb.opt{border-color:#1565c0;color:#82b1ff}.yb.opt.on{background:#1565c0;color:#fff}
+.zb{padding:6px 10px;border-radius:8px;font-size:0.74rem;font-weight:700;border:2px solid transparent;cursor:pointer;transition:all 0.15s;background:transparent;text-align:left;line-height:1.4}
+.zb.opt{border-color:#1565c0;color:#82b1ff}.zb.opt.on{background:#1565c0;color:#fff}
+.zb small{font-size:0.62rem;color:#aaa;display:block;font-weight:400}
+.zb.opt.on small{color:#cce}
+.dr{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #1a2540}
+.dr:last-child{border-bottom:none}
+.dr.done{opacity:0.45}
+.cb{width:20px;height:20px;border:2px solid #4fc3f7;border-radius:4px;cursor:pointer;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;background:transparent}
+.cb.gtf{border-color:#ff6d00}.cb.v25{border-color:#1565c0}.cb.cfm{border-color:#2e7d32}.cb.red{border-color:#e53935}
+.cb.on{background:#4fc3f7;border-color:#4fc3f7}.cb.gtf.on{background:#ff6d00;border-color:#ff6d00}
+.cb.v25.on{background:#1565c0;border-color:#1565c0}.cb.cfm.on{background:#2e7d32;border-color:#2e7d32}.cb.red.on{background:#e53935;border-color:#e53935}
+.cb.on::after{content:'✓';color:#fff;font-size:0.72rem;font-weight:900}
+.dt{font-size:0.8rem;color:#ccc;line-height:1.45;flex:1}
+.rc{border-radius:8px;padding:10px 14px;margin-bottom:8px;border-left:5px solid transparent;display:flex;gap:10px;align-items:flex-start}
+.rc.imm{background:#1f0000;border-color:#e53935}.rc.def{background:#1f1a00;border-color:#f9a825}
+.rc.ok{background:#001a00;border-color:#2e7d32}.rc.inf{background:#001a2e;border-color:#1565c0}
+.rc.war{background:#1a1000;border-color:#ff6d00}
+.ri{font-size:1.2rem;flex-shrink:0}
+.rb{flex:1}.rt{font-size:0.83rem;font-weight:800;margin-bottom:3px}
+.rc.imm .rt{color:#ff5252}.rc.def .rt{color:#ffd740}.rc.ok .rt{color:#69f0ae}.rc.inf .rt{color:#64b5f6}.rc.war .rt{color:#ffab40}
+.rd{font-size:0.74rem;color:#aaa;line-height:1.45}.rk{font-size:0.66rem;color:#555;margin-top:3px}
+.rdl{display:inline-block;margin-top:5px;padding:2px 10px;border-radius:10px;font-size:0.67rem;font-weight:800}
+.rc.imm .rdl{background:#7f0000;color:#ff8a80}.rc.def .rdl{background:#4a3800;color:#ffe082}
+.rc.ok .rdl{background:#003300;color:#69f0ae}.rc.inf .rdl{background:#0d2a50;color:#82b1ff}
+.dbtn{display:inline-block;margin-top:5px;margin-left:8px;padding:2px 10px;border-radius:10px;font-size:0.67rem;font-weight:700;cursor:pointer;border:1px solid #f9a825;background:transparent;color:#ffd740;transition:all 0.15s}
+.dbtn:hover{background:#f9a825;color:#000}.dbtn.done{background:#4a3800;color:#ffe082;cursor:default}
+.rgl{font-size:0.68rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.05em;padding:6px 0 3px;border-top:1px solid #1a2540;margin-top:4px}
+.note{background:#1a2a00;border-left:4px solid #8bc34a;padding:8px 12px;border-radius:0 6px 6px 0;margin:7px 0;font-size:0.74rem;color:#c5e1a5;line-height:1.5}
+.caut{background:#2a1a00;border-left:4px solid #ffa000;padding:8px 12px;border-radius:0 6px 6px 0;margin:7px 0;font-size:0.74rem;color:#ffe0a0;line-height:1.5}
+.ngtf{background:#1f0d00;border-left:4px solid #ff6d00;padding:8px 12px;border-radius:0 6px 6px 0;margin:7px 0;font-size:0.74rem;color:#ffcc80;line-height:1.5}
+.ncfm{background:#0d1f0d;border-left:4px solid #2e7d32;padding:8px 12px;border-radius:0 6px 6px 0;margin:7px 0;font-size:0.74rem;color:#a5d6a7;line-height:1.5}
+.nv25{background:#001528;border-left:4px solid #1565c0;padding:8px 12px;border-radius:0 6px 6px 0;margin:7px 0;font-size:0.74rem;color:#90caf9;line-height:1.5}
+.dp{margin:10px;background:#1a1500;border:1px solid #f9a825;border-radius:8px;overflow:hidden;display:none}
+.dp.show{display:block}.dph{background:#2a2000;padding:8px 12px;font-size:0.8rem;font-weight:700;color:#fdd835;display:flex;justify-content:space-between}
+.dpb{padding:10px 12px}
+.di{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid #2a2000;font-size:0.74rem}
+.di:last-child{border-bottom:none}.dit{flex:1;color:#ffe082;line-height:1.4}.did{font-size:0.66rem;color:#ffab40;white-space:nowrap;padding-top:2px}
+.dirm{background:none;border:1px solid #555;color:#888;border-radius:4px;padding:1px 6px;cursor:pointer;font-size:0.64rem}
+.rts{margin:10px;padding:12px 16px;border-radius:8px;border:2px solid #2e7d32;background:#001a00;display:none}
+.rts.show{display:block}.rts h3{color:#69f0ae;font-size:0.88rem;margin-bottom:8px}
+.rtsrow{display:flex;gap:8px;align-items:flex-start;font-size:0.77rem;margin-bottom:4px}
+.rtsd{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}.rtsd.ok{background:#69f0ae}.rtsd.nok{background:#ff5252}
+.bdg{display:inline-block;padding:1px 6px;border-radius:8px;font-size:0.61rem;font-weight:700;margin-left:4px;vertical-align:middle}
+.b1{background:#1a5276;color:#7fb3d3}.b2{background:#1e3a1e;color:#7dbb7d}
+.brii{background:#5c0000;color:#ff8888}.bgtf{background:#3d1f00;color:#ffab40}.bv25{background:#0d2a50;color:#82b1ff}.bcfm{background:#1b3a1b;color:#81c784}
+.btns{margin:8px 10px 14px;display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:6px;font-size:0.77rem;font-weight:700;cursor:pointer;border:none}
+.btn-r{background:#e94560;color:#fff}.btn-b{background:#0f3460;color:#4fc3f7;border:1px solid #4fc3f7}
+.eng-box{margin:8px 0;padding:10px;background:#0a1428;border-radius:8px;border:1px solid #2a3f6f}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>🐦 BIRD STRIKE — Checklist Operación en Línea</h1>
+  <p>A318/A319/A320/A321 · AMM 05-51-14-200-803-A · Rev 52 · Feb 2026 · V2500 + PW1100G GTF + CFM56</p>
+</div>
+
+<div class="warn-bar">⚠ <b>SALUD:</b> Guantes desechables + anticorte · Mono desechable · NO aire/agua a presión · <b>MOTOR:</b> Caliente hasta 1H post-apagado</div>
+
+<div class="mental"><b>💡 Regla Mental:</b> "¿Cambió el comportamiento del avión o motor?"<br>
+<b>NO →</b> Evento Menor — Fase 1 + walk-around + visual motor<br>
+<b>SÍ →</b> Evento Moderado/Mayor — BSI + inspecciones detalladas</div>
+
+<div class="banner" id="banner"><div class="bi" id="bi"></div><div class="bb"><h2 id="bt"></h2><p id="bd"></p></div></div>
+
+<div class="prog"><div class="prog-lbl"><span>Progreso</span><span id="pct">0%</span></div><div class="prog-bg"><div class="prog-fill" id="pbar" style="width: 0%;"></div></div></div>
+
+<div class="sec">
+  <div class="sh" onclick="tog(&#39;s1&#39;)"><div class="sn">1</div><div class="st">Datos del Evento — Tripulación</div><div class="sa" id="as1">▼</div></div>
+  <div class="sb open" id="s1">
+    <div class="sl">Tipo de Motor</div>
+    <div class="eng-box">
+      <div class="qr" style="border:none;padding:4px 0">
+        <div class="qt"><b>¿Qué motor tiene el avión?</b></div>
+        <div class="yw">
+          <button class="yb opt" onclick="pick(&#39;eng_type&#39;,&#39;gtf&#39;,this)">🟠 PW1100G / GTF<br><small style="font-size:0.62rem;color:#aaa">A/C 851-999 · NEO</small></button>
+          <button class="yb opt" onclick="pick(&#39;eng_type&#39;,&#39;v25&#39;,this)">🔵 V2500 / IAE<br><small style="font-size:0.62rem;color:#aaa">A/C 001-050, 101-150, 605-850</small></button>
+          <button class="yb opt" onclick="pick(&#39;eng_type&#39;,&#39;cfm&#39;,this)">⚪ CFM56 / LEAP<br><small style="font-size:0.62rem;color:#aaa">A/C 154-300, 351-600 CEO · TASK 72-00-00-200-006-A</small></button>
+        </div>
+      </div>
+    </div>
+    <div class="sl">Zona de Impacto</div>
+    <div class="qr">
+      <div class="qt"><b>¿Dónde impactó?</b> (selecciona todas las apliquen)</div>
+      <div class="yw" style="flex-wrap:wrap;gap:5px">
+        <button class="yb opt" onclick="toggleA(&#39;nose&#39;,this)">Nose / Radome</button>
+        <button class="yb opt" onclick="toggleA(&#39;windshield&#39;,this)">Windshield / Wiper</button>
+        <button class="yb opt" onclick="toggleA(&#39;fuselage_fwd&#39;,this)">Fuselaje Delantero</button>
+        <button class="yb opt" onclick="toggleA(&#39;fuselage_ctr&#39;,this)">Fuselaje Central</button>
+        <button class="yb opt" onclick="toggleA(&#39;fuselage_aft&#39;,this)">Fuselaje Trasero</button>
+        <button class="yb opt" onclick="toggleA(&#39;belly&#39;,this)">Belly Fairing</button>
+        <button class="yb opt" onclick="toggleA(&#39;engine&#39;,this)">Motor / Nacela</button>
+        <button class="yb opt" onclick="toggleA(&#39;pylon&#39;,this)">Pylon</button>
+        <button class="yb opt" onclick="toggleA(&#39;wing_le&#39;,this)">Wing Leading Edge / Slats</button>
+        <button class="yb opt" onclick="toggleA(&#39;wing_main&#39;,this)">Wing Main Structure</button>
+        <button class="yb opt" onclick="toggleA(&#39;wing_te&#39;,this)">Wing Trailing Edge / Flaps</button>
+        <button class="yb opt" onclick="toggleA(&#39;wingtip&#39;,this)">Wing Tip / Sharklet</button>
+        <button class="yb opt" onclick="toggleA(&#39;nlg&#39;,this)">NLG / Puertas NLG</button>
+        <button class="yb opt" onclick="toggleA(&#39;mlg&#39;,this)">MLG / Puertas MLG</button>
+        <button class="yb opt" onclick="toggleA(&#39;vtp&#39;,this)">Estabilizador Vertical (VTP)</button>
+        <button class="yb opt" onclick="toggleA(&#39;htp&#39;,this)">Estabilizador Horizontal (HTP)</button>
+        <button class="yb opt" onclick="toggleA(&#39;probes&#39;,this)">Probes / Sensores / Antenas</button>
+        <button class="yb opt" onclick="toggleA(&#39;unknown&#39;,this)">Desconocida</button>
+      </div>
+    </div>
+    <div class="qr">
+      <div class="qt"><b>Fase de vuelo</b></div>
+      <div class="yw">
+        <button class="yb opt" onclick="pick(&#39;phase&#39;,&#39;takeoff&#39;,this)">Despegue</button>
+        <button class="yb opt" onclick="pick(&#39;phase&#39;,&#39;climb&#39;,this)">Ascenso</button>
+        <button class="yb opt" onclick="pick(&#39;phase&#39;,&#39;cruise&#39;,this)">Crucero</button>
+        <button class="yb opt" onclick="pick(&#39;phase&#39;,&#39;approach&#39;,this)">Aprox/Final</button>
+        <button class="yb opt" onclick="pick(&#39;phase&#39;,&#39;landing&#39;,this)">Aterrizaje</button>
+        <button class="yb opt" onclick="pick(&#39;phase&#39;,&#39;ground&#39;,this)">Rodaje</button>
+      </div>
+    </div>
+    <div class="qr">
+      <div class="qt">¿Restos orgánicos en el <b>inlet o nacela del motor</b>?</div>
+      <div class="yw">
+        <button class="yb yes" onclick="Q.organic_engine=&#39;yes&#39;;this.closest(&#39;.yw&#39;).querySelectorAll(&#39;.yb&#39;).forEach(b=&gt;b.classList.remove(&#39;on&#39;));this.classList.add(&#39;on&#39;);render();">SÍ</button>
+        <button class="yb no" onclick="delete Q.organic_engine;this.closest(&#39;.yw&#39;).querySelectorAll(&#39;.yb&#39;).forEach(b=&gt;b.classList.remove(&#39;on&#39;));this.classList.add(&#39;on&#39;);render();">NO</button>
+      </div>
+    </div>
+    <div class="qr" id="motor-count-q">
+      <div class="qt"><b>¿Cuántos motores afectados?</b></div>
+      <div class="yw">
+        <button class="yb opt" onclick="pick(&#39;eng_count&#39;,&#39;0&#39;,this)">Ninguno</button>
+        <button class="yb opt" onclick="pick(&#39;eng_count&#39;,&#39;1&#39;,this)">1 Motor</button>
+        <button class="yb opt" onclick="pick(&#39;eng_count&#39;,&#39;2&#39;,this)">2 Motores</button>
+      </div>
+    </div>
+    <div id="motor-syms-block">
+    <div class="sl">Síntomas del Motor</div>
+    <div class="qr">
+      <div class="qt"><b>¿Síntomas del motor?</b></div>
+      <div class="yw" style="flex-wrap:wrap">
+        <button class="yb opt" onclick="toggleS(&#39;surge&#39;,this)">Surge</button>
+        <button class="yb opt" onclick="toggleS(&#39;stall&#39;,this)">Stall</button>
+        <button class="yb opt" onclick="toggleS(&#39;bang&#39;,this)">Bang/Pop</button>
+        <button class="yb opt" onclick="toggleS(&#39;flame&#39;,this)">Flame out</button>
+        <button class="yb opt" onclick="toggleS(&#39;vibration&#39;,this)">Vibración</button>
+        <button class="yb opt" onclick="toggleS(&#39;rumble&#39;,this)">Rumble</button>
+        <button class="yb opt" onclick="toggleS(&#39;egtrise&#39;,this)">EGT rise</button>
+        <button class="yb opt" onclick="toggleS(&#39;parfluct&#39;,this)">Parámetros alterados</button>
+        <button class="yb opt" onclick="toggleS(&#39;none&#39;,this)">Ninguno</button>
+      </div>
+    </div>
+    </div>
+    <div class="qr">
+      <div class="qt">¿Olor a <b>"ave cocida"</b> en cockpit o cabina?</div>
+      <div class="yw">
+        <button class="yb yes" onclick="pick(&#39;smell&#39;,&#39;yes&#39;,this)">SÍ</button>
+        <button class="yb no" onclick="pick(&#39;smell&#39;,&#39;no&#39;,this)">NO</button>
+      </div>
+    </div>
+    <div class="qr">
+      <div class="qt">¿ECAM alertas de motor? <b>(ENG FAIL / STALL / VIB / OIL / FUEL FILTER)</b></div>
+      <div class="yw">
+        <button class="yb yes" onclick="pick(&#39;ecam&#39;,&#39;yes&#39;,this)">SÍ</button>
+        <button class="yb no" onclick="pick(&#39;ecam&#39;,&#39;no&#39;,this)">NO</button>
+      </div>
+    </div>
+    <div class="sl">Síntomas del Avión</div>
+    <div class="qr">
+      <div class="qt">¿Problemas en flight controls / hidráulico / navegación / ILS / radios?</div>
+      <div class="yw">
+        <button class="yb yes" onclick="pick(&#39;systems&#39;,&#39;yes&#39;,this)">SÍ</button>
+        <button class="yb no" onclick="pick(&#39;systems&#39;,&#39;no&#39;,this)">NO</button>
+      </div>
+    </div>
+    <div class="qr">
+      <div class="qt">¿Vibración fuerte / rumble en el <b>airframe</b>?</div>
+      <div class="yw">
+        <button class="yb yes" onclick="pick(&#39;airframe_vib&#39;,&#39;yes&#39;,this)">SÍ</button>
+        <button class="yb no" onclick="pick(&#39;airframe_vib&#39;,&#39;no&#39;,this)">NO</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sh" onclick="tog(&#39;s2&#39;)"><div class="sn">2</div><div class="st">Walk-Around — Hallazgos Visuales</div><div class="sa" id="as2">▼</div></div>
+  <div class="sb open" id="s2">
+    <div class="note">Buenas condiciones de iluminación. Patrón AMM fig. 05-51-14-991-00100-00-A.</div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;wa1&#39;)"></div><div class="dt">Inspección desde suelo + ventanas cabina + plataforma 3M</div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;wa2&#39;)"></div><div class="dt">Registrar daños en Damage Reporting Sheet</div></div>
+    <div class="sl">Hallazgos</div>
+    <div class="qr"><div class="qt">¿Restos orgánicos visibles (sangre, plumas, snarge)?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;organic&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;organic&#39;,&#39;no&#39;,this)">NO</button></div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sh" onclick="tog(&#39;s3&#39;)"><div class="sn">3</div><div class="st">Radome — DVI Obligatoria Siempre ⚠</div><div class="sa" id="as3">▶</div></div>
+  <div class="sb" id="s3">
+    <div class="caut">Aunque no haya restos ni marcas externas → puede existir disbonding interno.</div>
+    <div class="dr"><div class="cb red" onclick="chk(this,&#39;r1&#39;)"></div><div class="dt">Abrir Radome <span class="bdg b1">TASK 53-15-11-010-001-A</span></div></div>
+    <div class="dr"><div class="cb red" onclick="chk(this,&#39;r2&#39;)"></div><div class="dt">DVI EXTERNA: scratches, dents, pintura, studs, latches</div></div>
+    <div class="dr"><div class="cb red" onclick="chk(this,&#39;r3&#39;)"></div><div class="dt">DVI INTERNA: disbonding, delamination, white spots, core crush</div></div>
+    <div class="qr"><div class="qt">¿Disbonding, delamination u otro daño en radome?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;radome_dmg&#39;,&#39;yes&#39;,this)">SÍ — Hay daño</button><button class="yb no" onclick="pick(&#39;radome_dmg&#39;,&#39;no&#39;,this)">NO — Sin daño</button></div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;r4&#39;)"></div><div class="dt">DVI antena weather radar</div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;r5&#39;)"></div><div class="dt">DVI antenas localizer y glide/slope (ILS)</div></div>
+    <div class="qr"><div class="qt">¿Daño en antenas ILS?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;ils_dmg&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;ils_dmg&#39;,&#39;no&#39;,this)">NO</button></div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;r6&#39;)"></div><div class="dt">DVI estructura frame 0</div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;r7&#39;)"></div><div class="dt">Cerrar Radome <span class="bdg b1">TASK 53-15-11-410-001-A</span></div></div>
+  </div>
+</div>
+
+<div class="sec gtf" id="sec-gtf" style="display:none">
+  <div class="sh" onclick="tog(&#39;s4&#39;)"><div class="sn">4</div><div class="st">Motor PW1100G / GTF <span class="bdg bgtf">TASK 72-00-00-210-807-A</span></div><div class="sa" id="as4">▶</div></div>
+  <div class="sb" id="s4">
+    <div class="ngtf">⚙ PW1000G/PW1100G · A/C 851-999 (NEO)</div>
+    <div class="dr"><div class="cb gtf" onclick="chk(this,&#39;g1&#39;)"></div><div class="dt">Prevenir motoreo <span class="bdg b1">TASK 71-00-00-860-833-A</span></div></div>
+    <div class="dr"><div class="cb gtf" onclick="chk(this,&#39;g2&#39;)"></div><div class="dt">MAT-WORK + MAT-PROTECTIVE en inlet cowl · Plataforma 1M</div></div>
+    <div class="sl">Inspección Inlet con Luz UV</div>
+    <div class="qr">
+      <div class="qt">¿Está disponible la <b>LIGHT SOURCE ULTRA-VIOLET</b>?</div>
+      <div class="yw">
+        <button class="yb yes" onclick="pick(&#39;uv_available&#39;,&#39;yes&#39;,this)">SÍ</button>
+        <button class="yb no" onclick="pick(&#39;uv_available&#39;,&#39;no&#39;,this)">NO</button>
+      </div>
+    </div>
+    <div class="qr" id="uv-result-q" style="display:none">
+      <div class="qt">🔦 Resultado UV: ¿Restos orgánicos en inlet?</div>
+      <div class="yw">
+        <button class="yb yes" onclick="pick(&#39;uv_found&#39;,&#39;yes&#39;,this)">SÍ</button>
+        <button class="yb no" onclick="pick(&#39;uv_found&#39;,&#39;no&#39;,this)">NO</button>
+      </div>
+    </div>
+    <div class="qr" id="uv-noavail-q" style="display:none">
+      <div class="qt">👁 ¿Restos visibles sin UV (sangre, snarge, plumas)?</div>
+      <div class="yw">
+        <button class="yb yes" onclick="pick(&#39;visual_found&#39;,&#39;yes&#39;,this)">SÍ</button>
+        <button class="yb no" onclick="pick(&#39;visual_found&#39;,&#39;no&#39;,this)">NO</button>
+      </div>
+    </div>
+    <div class="sl">Zona de evidencia</div>
+    <div class="qr">
+      <div class="qt"><b>¿Hasta dónde llegó la evidencia?</b></div>
+      <div class="yw" style="flex-wrap:wrap;gap:6px">
+        <button class="zb opt" onclick="pickZ(&#39;gtf_zone&#39;,&#39;z1&#39;,this)">🟢 <b>Zona 1</b><small>Solo inlet cowl / acoustic liners. Sin daño interno.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;gtf_zone&#39;,&#39;z2&#39;,this)">🟡 <b>Zona 2 — Fan blades dañadas</b><small>Daño en fan blades / annulus fillers.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;gtf_zone&#39;,&#39;z3&#39;,this)">🟠 <b>Zona 3 — Flujo secundario</b><small>Rear fan blades / OGV / fan duct / FAV / thrust reverser.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;gtf_zone&#39;,&#39;z4&#39;,this)">🔴 <b>Zona 4 — Core zone</b><small>Evidencia en LPC / HPC / combustor / HPT.</small></button>
+      </div>
+    </div>
+    <div class="qr" id="gtf-area-q" style="display:none">
+      <div class="qt">¿Daño en fan blades en <b>Área A</b>?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;area_a&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;area_a&#39;,&#39;no&#39;,this)">NO</button></div>
+    </div>
+    <div class="qr" id="gtf-lim-q" style="display:none">
+      <div class="qt">¿Daño en fan blades <b>dentro de los límites</b>?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;blade_lim&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;blade_lim&#39;,&#39;no&#39;,this)">NO</button></div>
+    </div>
+    <div class="qr">
+      <div class="qt">¿Rotor LPC gira <b>libremente</b>?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;rotor&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;rotor&#39;,&#39;no&#39;,this)">NO</button></div>
+    </div>
+    <div class="dr"><div class="cb gtf" onclick="chk(this,&#39;g3&#39;)"></div><div class="dt">Fotografiar daño · Recolectar restos</div></div>
+    <div class="dr"><div class="cb gtf" onclick="chk(this,&#39;g4&#39;)"></div><div class="dt">Inspeccionar TEC + LPT 3rd stage blades <span class="bdg b1">TASK 72-00-00-210-812-A</span></div></div>
+  </div>
+</div>
+
+<div class="sec v25" id="sec-v25" style="display:none">
+  <div class="sh" onclick="tog(&#39;s5&#39;)"><div class="sn">5</div><div class="st">Motor V2500 / IAE <span class="bdg bv25">TASK 72-00-00-200-010-A</span></div><div class="sa" id="as5">▶</div></div>
+  <div class="sb" id="s5">
+    <div class="nv25">⚙ V2500-A1 / V2500-A5 · A/C 001-050, 101-150, 605-850</div>
+    <div class="dr"><div class="cb v25" onclick="chk(this,&#39;v1&#39;)"></div><div class="dt">Aviso NO ARRANCAR en pedestal</div></div>
+    <div class="dr"><div class="cb v25" onclick="chk(this,&#39;v2&#39;)"></div><div class="dt">Esperar mínimo 5 min post-apagado</div></div>
+    <div class="dr"><div class="cb v25" onclick="chk(this,&#39;v3&#39;)"></div><div class="dt">Inspeccionar inlet cowl, P2/T2, inlet cone <span class="bdg b1">TASK 72-38-11-200-010-B</span></div></div>
+    <div class="dr"><div class="cb v25" onclick="chk(this,&#39;v4&#39;)"></div><div class="dt">Limpiar fan blades <span class="bdg b1">TASK 72-31-11-100-010-A</span></div></div>
+    <div class="dr"><div class="cb v25" onclick="chk(this,&#39;v5&#39;)"></div><div class="dt">Inspeccionar annulus fillers y fan blades <span class="bdg b1">TASK 72-31-11-200-010-B</span></div></div>
+    <div class="qr"><div class="qt">¿Daño en fan blades o rub en fan track liner?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;v25_blade_dmg&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;v25_blade_dmg&#39;,&#39;no&#39;,this)">NO</button></div></div>
+    <div class="sl">Zona de evidencia</div>
+    <div class="qr">
+      <div class="qt"><b>¿Hasta dónde llegó la evidencia?</b></div>
+      <div class="yw" style="flex-wrap:wrap;gap:6px">
+        <button class="zb opt" onclick="pickZ(&#39;v25_zone&#39;,&#39;z1&#39;,this)">🟢 <b>Zona 1</b><small>Solo inlet / leading edge blades.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;v25_zone&#39;,&#39;z2a&#39;,this)">🟡 <b>Zona 2A — Área A</b><small>Liners acústicos / suction side &lt;50% span.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;v25_zone&#39;,&#39;z2b&#39;,this)">🟡 <b>Zona 2B — Área B fuera límites</b><small>Daño Área B que supera AMM.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;v25_zone&#39;,&#39;z3&#39;,this)">🟠 <b>Zona 3 — Flujo secundario</b><small>OGV / fan duct / thrust reverser / FAV.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;v25_zone&#39;,&#39;z4&#39;,this)">🔴 <b>Zona 4 — Core zone</b><small>Evidencia en LPC IGV / LPC stages / HPC.</small></button>
+      </div>
+    </div>
+    <div class="qr"><div class="qt">¿Rotor LP Compressor gira <b>libremente</b>?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;v25_rotor&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;v25_rotor&#39;,&#39;no&#39;,this)">NO</button></div></div>
+  </div>
+</div>
+
+<div class="sec cfm" id="sec-cfm" style="display:none">
+  <div class="sh" onclick="tog(&#39;s5b&#39;)"><div class="sn">5</div><div class="st">Motor CFM56 / LEAP <span class="bdg bcfm">TASK 72-00-00-200-006-A</span></div><div class="sa" id="as5b">▶</div></div>
+  <div class="sb" id="s5b">
+    <div class="ncfm">⚙ CFM56-5B / LEAP-1A · A/C 154-300, 351-600</div>
+    <div class="dr"><div class="cb cfm" onclick="chk(this,&#39;cf1&#39;)"></div><div class="dt">Aviso NO ARRANCAR · Esperar 5 min</div></div>
+    <div class="dr"><div class="cb cfm" onclick="chk(this,&#39;cf2&#39;)"></div><div class="dt">Abrir fan cowl doors <span class="bdg b1">TASK 71-13-00-010-040-B</span></div></div>
+    <div class="dr"><div class="cb cfm" onclick="chk(this,&#39;cf3&#39;)"></div><div class="dt">Inspeccionar spinner, fan blades, acoustic panels, booster IGV, OGV</div></div>
+    <div class="dr"><div class="cb cfm" onclick="chk(this,&#39;cf4&#39;)"></div><div class="dt">Inspeccionar LPT Stage 4 a través del exhaust nozzle</div></div>
+    <div class="qr"><div class="qt">¿Daño en fan blades?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;cfm_blade_dmg&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;cfm_blade_dmg&#39;,&#39;no&#39;,this)">NO</button></div></div>
+    <div class="qr"><div class="qt">¿Evidencia de debris en booster inlet?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;cfm_booster_dmg&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;cfm_booster_dmg&#39;,&#39;no&#39;,this)">NO</button></div></div>
+    <div class="qr"><div class="qt">¿Rotor gira libremente?</div>
+      <div class="yw"><button class="yb yes" onclick="pick(&#39;cfm_rotor&#39;,&#39;yes&#39;,this)">SÍ</button><button class="yb no" onclick="pick(&#39;cfm_rotor&#39;,&#39;no&#39;,this)">NO</button></div></div>
+    <div class="sl">Zona de evidencia</div>
+    <div class="qr">
+      <div class="qt"><b>¿Hasta dónde llegó la evidencia?</b></div>
+      <div class="yw" style="flex-wrap:wrap;gap:6px">
+        <button class="zb opt" onclick="pickZ(&#39;cfm_zone&#39;,&#39;z1&#39;,this)">🟢 <b>Zona 1</b><small>Inlet / fan blades sin missing material.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;cfm_zone&#39;,&#39;z2&#39;,this)">🟡 <b>Zona 2 — Fan blades / booster</b><small>Missing material o evidencia en booster inlet.</small></button>
+        <button class="zb opt" onclick="pickZ(&#39;cfm_zone&#39;,&#39;z3&#39;,this)">🔴 <b>Zona 3 — Parámetros anormales</b><small>Surge / stall / flameout / mismatch N2/EGT.</small></button>
+      </div>
+    </div>
+    <div class="dr"><div class="cb cfm" onclick="chk(this,&#39;cf5&#39;)"></div><div class="dt">Cerrar fan cowl doors <span class="bdg b1">TASK 71-13-00-410-040-B</span></div></div>
+  </div>
+</div>
+
+<div class="sec">
+  <div class="sh" onclick="tog(&#39;s6&#39;)"><div class="sn">6</div><div class="st">Configuración &amp; Cierre <span class="bdg b1">TASK 05-51-14-200-803-A</span></div><div class="sa" id="as6">▶</div></div>
+  <div class="sb" id="s6">
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;c1&#39;)"></div><div class="dt">SATCOM OFF · Calzos · Safety devices · Tierra · Energizar circuitos</div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;c2&#39;)"></div><div class="dt">Extender flaps/slats · THS nose-up · Despresurizar HYD Green/Yellow</div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;c3&#39;)"></div><div class="dt">Abrir radome · Warning notices en cabina · Plataforma 3M</div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;c4&#39;)"></div><div class="dt">Área limpia · Retirar warnings · Cerrar paneles y puertas · Cerrar radome</div></div>
+    <div class="dr"><div class="cb" onclick="chk(this,&#39;c5&#39;)"></div><div class="dt">Retraer flaps/slats · THS neutral · Reactivar SATCOM · Retirar plataformas</div></div>
+    <div class="sl">Operational Tests — solo si daño en superficies de control</div>
+    <div class="dr"><div class="cb red" onclick="chk(this,&#39;c6&#39;)"></div><div class="dt">Ailerones × 3 · Rudder × 3 · Elevators × 3 · THS × 3 · Spoilers × 3 · Flaps/Slats × 3</div></div>
+  </div>
+</div>
+
+<div class="sec res" id="res-sec">
+  <div class="sh" onclick="tog(&#39;sa&#39;)"><div class="sn" id="res-sn">★</div><div class="st" id="res-st">Clasificación y Acciones Requeridas</div><div class="sa" id="asa">▼</div></div>
+  <div class="sb open" id="sa"><div id="res-body"><div style="color:#555;font-size:0.78rem;text-align:center;padding:16px">Responde las preguntas para ver las acciones.</div></div></div>
+</div>
+
+<div class="dp" id="dp"><div class="dph"><span>📌 Inspecciones Diferidas</span><span id="dp-cnt"></span></div><div class="dpb" id="dp-body"></div></div>
+<div class="rts" id="rts"><h3>✈ Criterios Return to Service</h3><div id="rts-body"></div></div>
+
+<div class="btns">
+  <button class="btn btn-r" onclick="resetAll()">🔄 Reiniciar</button>
+  <button class="btn btn-b" onclick="exportReport()">📤 Exportar Reporte</button>
+</div>
+
+<script>
+const Q={},DONE={},DEF={},SYMS=new Set(),AREAS=new Set();
+let totalCB=0;
+window.onload=()=>{totalCB=document.querySelectorAll('.cb').length;render();};
+function toggleA(id,btn){btn.classList.toggle('on');AREAS.has(id)?AREAS.delete(id):AREAS.add(id);render();}
+function toggleS(id,btn){
+  if(id==='none'){SYMS.clear();document.querySelectorAll('[onclick^="toggleS"]').forEach(b=>{if(!b.getAttribute('onclick').includes("'none'"))b.classList.remove('on');});SYMS.add('none');btn.classList.add('on');}
+  else{SYMS.delete('none');document.querySelectorAll('[onclick^="toggleS"]').forEach(b=>{if(b.getAttribute('onclick').includes("'none'"))b.classList.remove('on');});if(SYMS.has(id)){SYMS.delete(id);btn.classList.remove('on');}else{SYMS.add(id);btn.classList.add('on');}}
+  render();
+}
+function pick(id,val,btn){
+  btn.closest('.yw').querySelectorAll('.yb,.zb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');Q[id]=val;
+  if(id==='eng_type'){
+    document.getElementById('sec-gtf').style.display=val==='gtf'?'block':'none';
+    document.getElementById('sec-v25').style.display=val==='v25'?'block':'none';
+    document.getElementById('sec-cfm').style.display=val==='cfm'?'block':'none';
+  }
+  if(id==='uv_available'){
+    document.getElementById('uv-result-q').style.display=val==='yes'?'block':'none';
+    document.getElementById('uv-noavail-q').style.display=val==='no'?'block':'none';
+  }
+  if(id==='gtf_zone'){
+    document.getElementById('gtf-area-q').style.display=val==='z2'?'block':'none';
+    document.getElementById('gtf-lim-q').style.display=val==='z2'?'block':'none';
+  }
+  render();updateProg();
+}
+function pickZ(id,val,btn){btn.closest('.yw').querySelectorAll('.zb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');Q[id]=val;render();updateProg();}
+function chk(el,id){el.classList.toggle('on');const row=el.closest('.dr');if(el.classList.contains('on')){DONE[id]=true;row&&row.classList.add('done');}else{delete DONE[id];row&&row.classList.remove('done');}updateProg();}
+function tog(id){const b=document.getElementById(id),a=document.getElementById('a'+id);if(!b)return;const o=b.classList.toggle('open');if(a)a.textContent=o?'▼':'▶';}
+function updateProg(){const t=totalCB+Object.keys(Q).length+(SYMS.size>0?1:0)+(AREAS.size>0?1:0);const d=Object.keys(DONE).length+Object.keys(Q).length+(SYMS.size>0?1:0)+(AREAS.size>0?1:0);const p=t>0?Math.round(d/t*100):0;document.getElementById('pct').textContent=p+'%';document.getElementById('pbar').style.width=p+'%';}
+function classify(){
+  const crit=['surge','stall','flame','vibration','rumble','egtrise','parfluct','bang'];
+  const hasCrit=crit.some(s=>SYMS.has(s));
+  const is2=Q.eng_count==='2';
+  const major=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||Q.airframe_vib==='yes'||Q.systems==='yes'||
+    Q.blade_lim==='no'||Q.rotor==='no'||Q.v25_rotor==='no'||Q.radome_dmg==='yes'||Q.ils_dmg==='yes'||is2||
+    Q.gtf_zone==='z4'||Q.v25_zone==='z4'||Q.cfm_zone==='z3'||Q.cfm_rotor==='no';
+  const moderate=!major&&(Q.organic==='yes'||Q.v25_blade_dmg==='yes'||Q.uv_found==='yes'||
+    Q.area_a==='yes'||Q.visual_found==='yes'||
+    Q.gtf_zone==='z2'||Q.gtf_zone==='z3'||
+    Q.v25_zone==='z2a'||Q.v25_zone==='z2b'||Q.v25_zone==='z3'||
+    Q.cfm_zone==='z2'||Q.cfm_blade_dmg==='yes'||Q.cfm_booster_dmg==='yes'||
+    AREAS.has('windshield')||AREAS.has('nlg')||AREAS.has('mlg')||
+    AREAS.has('vtp')||AREAS.has('htp')||AREAS.has('wing_le'));
+  if(major)return 'major';
+  if(moderate)return 'moderate';
+  if(Object.keys(Q).length+SYMS.size>=4)return 'minor';
+  return null;
+}
+function card(type,icon,title,detail,dl,task,dkey,dlabel){
+  const isDef=DEF[dkey];
+  const dBtn=dkey&&!isDef?`<button class="dbtn" onclick="defer_('${dkey}','${title.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${dlabel}','${task}')">📌 Diferir · ${dlabel}</button>`:dkey&&isDef?`<span class="dbtn done">📌 Diferida</span>`:'';
+  return `<div class="rc ${type}"><div class="ri">${icon}</div><div class="rb"><div class="rt">${title}</div><div class="rd">${detail}</div>${task?`<div class="rk">${task}</div>`:''}${dl?`<span class="rdl">${dl}</span>`:''}${dBtn}</div></div>`;
+}
+function grp(t){return `<div class="rgl">${t}</div>`;}
+function render(){
+  const level=classify();
+  const b=document.getElementById('banner');
+  if(!level){b.className='banner';}else{
+    const cfg={minor:{icon:'🟢',title:'EVENTO MENOR',desc:'Sin cambios en comportamiento.',cls:'minor'},moderate:{icon:'🟡',title:'EVENTO MODERADO',desc:'Restos visibles o daño localizado. BSI posiblemente diferible.',cls:'moderate'},major:{icon:'🔴',title:'EVENTO MAYOR',desc:'Cambio en comportamiento, parámetros alterados o 2 motores. BSI inmediata.',cls:'major'}}[level];
+    b.className=`banner show ${cfg.cls}`;document.getElementById('bi').textContent=cfg.icon;document.getElementById('bt').textContent=cfg.title;document.getElementById('bd').textContent=cfg.desc;
+    const rs=document.getElementById('res-sec');rs.className=`sec res ${cfg.cls}`;document.getElementById('res-st').textContent=`EVENTO ${cfg.title.split(' ')[1]} — Acciones`;
+  }
+  const body=document.getElementById('res-body');
+  if(!level){body.innerHTML='<div style="color:#555;font-size:0.78rem;text-align:center;padding:16px">Responde las preguntas para ver las acciones.</div>';renderDefer();updateProg();return;}
+  const isGTF=Q.eng_type==='gtf',isV25=Q.eng_type==='v25',isCFM=Q.eng_type==='cfm';
+  const is2=Q.eng_count==='2';
+  const crit=['surge','stall','flame','vibration','rumble','egtrise','parfluct','bang'];
+  const hasCrit=crit.some(s=>SYMS.has(s));
+  const gtfZ=Q.gtf_zone||null,v25Z=Q.v25_zone||null,cfmZ=Q.cfm_zone||null;
+  const engineAffected=AREAS.has('engine')||Q.eng_count==='1'||Q.eng_count==='2'||hasCrit||Q.smell==='yes'||Q.ecam==='yes'||Q.organic_engine==='yes'||level==='major';
+  let h='';
+  h+=grp('Siempre requerido');
+  h+=card('imm','📋','Walk-Around Fase 1 Completa','GVI de todas las superficies externas. Patrón AMM.','Antes del próximo vuelo','TASK 05-51-14-200-803-A','','');
+  h+=card('imm','🔵','DVI Radome — Obligatoria Siempre','Abrir y DVI interna + externa aunque no haya marcas.','Antes del próximo vuelo','TASK 53-15-11-200-001-A','','');
+  if(engineAffected){
+    if(isGTF)h+=card('imm','🟠','Inspección Visual Motor GTF','Fan blades, spinner, acoustic panels, LPC inlet (UV). TEC + LPT 3rd stage.','Antes del próximo vuelo','TASK 72-00-00-210-807-A','','');
+    if(isV25)h+=card('imm','🔵','Inspección Visual Motor V2500','Inlet cowl, P2/T2, inlet cone, fan blades, annulus fillers, fan case, FEGV.','Antes del próximo vuelo','TASK 72-00-00-200-010-A','','');
+    if(isCFM)h+=card('imm','⚪','Inspección Visual Motor CFM56','Spinner, fan blades, acoustic panels, booster IGV, OGV, T12 probe, LPT exhaust.','Antes del próximo vuelo','TASK 72-00-00-200-006-A','','');
+  }
+  if(Q.radome_dmg==='yes')h+=card('imm','🔴','DVI Detallada Radome — Daño encontrado','Riesgo de colapso en vuelo si no se repara.','Antes del próximo vuelo','TASK 53-15-11-200-001-A','','');
+  if(Q.ils_dmg==='yes')h+=card('imm','📡','Test Funcional ILS','','Antes del próximo vuelo','TASK 34-36-00-720-002-A','','');
+  if(Q.rotor==='no')h+=card('imm','⛔','ROTOR GTF NO GIRA — RECHAZAR','LPC no gira. Motor fuera de servicio.','MOTOR RECHAZADO','Contactar PW Field Service Rep','','');
+  if(Q.v25_rotor==='no')h+=card('imm','⛔','ROTOR V2500 NO GIRA — RECHAZAR','LP Compressor no gira. Motor fuera de servicio.','MOTOR RECHAZADO','TASK 72-00-00-200-010-A','','');
+  if(Q.cfm_rotor==='no')h+=card('imm','⛔','ROTOR CFM56 NO GIRA — RECHAZAR','Fan no gira. Motor fuera de servicio.','MOTOR RECHAZADO','Contactar CFM Field Service Rep','','');
+  if(engineAffected){
+    h+=grp('Borescope Inspection (BSI)');
+    const gtfImm=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||Q.blade_lim==='no'||is2||gtfZ==='z4';
+    const v25Imm=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||is2||v25Z==='z4';
+    const cfmImm=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||is2||cfmZ==='z3';
+    if(isGTF){
+      if(gtfImm)h+=card('imm','🔴','BSI LPC — INMEDIATA · No Diferible (GTF)','LPC → si debris → HPC → HPT/Combustor → LPT.','ANTES DEL PRÓXIMO VUELO','TASK 72-31-00-290-802-A → 72-35-00-290-801-A → 72-41-00-290-802-A','','');
+      else if(gtfZ==='z2')h+=card('def','🟡','BSI LPC — Diferible (GTF)','Zona 2: fan blade damage sin parámetros alterados.','10 FH o 2 FC','TASK 72-31-00-290-802-A','bsi-gtf','10 FH / 2 FC');
+      else if(gtfZ==='z1')h+=card('ok','✅','BSI GTF — No Requerida · Zona 1','Sin evidencia de ingreso al LPC.','','','','');
+      else if(gtfZ==='z3')h+=card('inf','🟠','BSI GTF — No requerida · Zona 3','Flujo secundario sin ingreso al core.','','','','');
+      else h+=card('inf','ℹ️','BSI GTF — Selecciona zona de evidencia','','','','','');
+    }
+    if(isV25){
+      if(v25Imm)h+=card('imm','🔴','BSI LPC + HPC — INMEDIATA (V2500)','LPC IGV + LPC stages 1.5/2.5 + HPC stages 3/6.','ANTES DEL PRÓXIMO VUELO','TASK 72-32-91-200-010-B + TASK 72-00-00-200-017-B','','');
+      else if(v25Z==='z2a')h+=card('def','🟡','BSI LPC IGV + LPC + HPC — Diferible · Zona 2A (V2500)','Área A comprometida.','10 FH o 2 FC','TASK 72-32-91-200-010-B','bsi-v25','10 FH / 2 FC');
+      else if(v25Z==='z2b')h+=card('def','🟡','BSI LPC IGV + LPC — Diferible · Zona 2B (V2500)','Área B fuera de límites. Si LPC limpio → STOP.','10 FH o 2 FC','TASK 72-32-91-200-010-B','bsi-v25b','10 FH / 2 FC');
+      else if(v25Z==='z1')h+=card('ok','✅','BSI V2500 — No Requerida · Zona 1','','','','','');
+      else if(v25Z==='z3')h+=card('inf','🟠','BSI V2500 — No requerida · Zona 3','Flujo secundario.','','','','');
+      else h+=card('inf','ℹ️','BSI V2500 — Selecciona zona de evidencia','','','','','');
+    }
+    if(isCFM){
+      if(cfmImm)h+=card('imm','🔴','BSI HPC + Combustion Chamber — INMEDIATA (CFM56)','BSI Booster + HPC stages 1,4,8 + Combustion Chamber + Power Assurance Check.','ANTES DEL PRÓXIMO VUELO','TASK 72-21-00-290-003-A + TASK 72-31-00-290-002-A + TASK 72-42-00-290-005-A','','');
+      else if(cfmZ==='z2'||Q.cfm_blade_dmg==='yes')h+=card('def','🟡','BSI HPC + Combustion Chamber — Diferible (CFM56)','','25 FH o 10 FC','TASK 72-31-00-290-002-A + TASK 72-42-00-290-005-A','bsi-cfm','25 FH / 10 FC');
+      else if(cfmZ==='z1')h+=card('ok','✅','BSI CFM56 — No Requerida · Zona 1','','','','','');
+      else h+=card('inf','ℹ️','BSI CFM56 — Selecciona zona de evidencia','','','','','');
+    }
+    h+=grp('Engine Wash');
+    const washImm=hasCrit||is2||gtfZ==='z4'||v25Z==='z4';
+    if(isGTF)h+=washImm?card('imm','🚿','Engine Wash GTF — INMEDIATO','','Antes del próximo vuelo','TASK 72-00-00-100-802-A','',''):card('def','🚿','Engine Wash GTF — Diferible','','25 FH o 10 FC','TASK 72-00-00-100-802-A','wash-gtf','25 FH / 10 FC');
+    if(isV25)h+=washImm?card('imm','🚿','Compressor Wash V2500 — INMEDIATO','','Antes del próximo vuelo','TASK 72-00-00-100-010-A','',''):card('def','🚿','Compressor Wash V2500 — Diferible','','25 h elapsed','TASK 72-00-00-100-010-A','wash-v25','25 h elapsed');
+    if(isCFM)h+=washImm?card('imm','🚿','Engine Wash CFM56 — INMEDIATO','','Antes del próximo vuelo','TASK 72-00-00-100-010-A','',''):card('def','🚿','Engine Wash CFM56 — Diferible','','25 FH o 10 FC','TASK 72-00-00-100-010-A','wash-cfm','25 FH / 10 FC');
+  }
+  body.innerHTML=h;
+  renderRTS(level);renderDefer();updateProg();
+}
+function renderRTS(level){
+  const box=document.getElementById('rts'),body=document.getElementById('rts-body');
+  if(!level){box.classList.remove('show');return;}
+  box.classList.add('show');
+  const crit=['surge','stall','flame','vibration','rumble','egtrise','parfluct','bang'];
+  const criteria=[
+    {l:'Sin daño estructural no reparado',ok:Q.struct_dmg!=='yes'},
+    {l:'Motor sin comportamiento anormal',ok:!crit.some(s=>SYMS.has(s))},
+    {l:'Sin vibración anormal en airframe',ok:Q.airframe_vib!=='yes'},
+    {l:'Sin olor a ave cocida',ok:Q.smell!=='yes'},
+    {l:'Sin ECAM alertas no resueltas',ok:Q.ecam!=='yes'},
+    {l:'Rotor LP Compressor gira libremente',ok:Q.rotor!=='no'&&Q.v25_rotor!=='no'&&Q.cfm_rotor!=='no'},
+    {l:'Radome inspeccionado sin daño crítico',ok:Q.radome_dmg!=='yes'},
+    {l:'Probes y antenas sin daño',ok:Q.ils_dmg!=='yes'},
+    {l:'Sin sistemas afectados (FLT CTRL / HYD / NAV)',ok:Q.systems!=='yes'},
+  ];
+  const hasDef=Object.keys(DEF).length>0;
+  let html=criteria.map(x=>`<div class="rtsrow"><div class="rtsd ${x.ok?'ok':'nok'}"></div><div style="flex:1;font-size:0.77rem;color:#ccc">${x.l}</div><span style="font-size:0.77rem;font-weight:700;color:${x.ok?'#69f0ae':'#ff5252'}">${x.ok?'✓':'✗'}</span></div>`).join('');
+  const allOk=criteria.every(x=>x.ok);
+  let vBg,vBorder,vColor,vText;
+  if(!allOk){vBg='#3d0000';vBorder='#e53935';vColor='#ff5252';vText='⛔ NO RTS — Resolver hallazgos críticos.';}
+  else if(hasDef){vBg='#2a2000';vBorder='#f9a825';vColor='#ffd740';vText='✈ RTS CONDICIONAL — Inspecciones diferidas pendientes.';}
+  else{vBg='#003300';vBorder='#2e7d32';vColor='#69f0ae';vText='✅ RTS — Todos los criterios cumplidos.';}
+  html+=`<div style="margin-top:10px;padding:10px;border-radius:6px;background:${vBg};border:2px solid ${vBorder};font-size:0.8rem;font-weight:700;color:${vColor};text-align:center">${vText}</div>`;
+  body.innerHTML=html;
+}
+function defer_(key,title,dl,task){DEF[key]={title,dl,task};render();}
+function renderDefer(){
+  const p=document.getElementById('dp'),b=document.getElementById('dp-body'),c=document.getElementById('dp-cnt');
+  const keys=Object.keys(DEF);
+  if(!keys.length){p.classList.remove('show');return;}
+  p.classList.add('show');c.textContent=keys.length+' diferida'+(keys.length>1?'s':'');
+  b.innerHTML=keys.map(k=>{const d=DEF[k];return`<div class="di"><span>📌</span><div class="dit">${d.title}<br><span style="color:#888;font-size:0.66rem">${d.task}</span></div><div class="did">${d.dl}</div><button class="dirm" onclick="delete DEF['${k}'];render()">✕</button></div>`;}).join('');
+}
+function resetAll(){
+  if(!confirm('¿Reiniciar todo?'))return;
+  Object.keys(Q).forEach(k=>delete Q[k]);Object.keys(DONE).forEach(k=>delete DONE[k]);Object.keys(DEF).forEach(k=>delete DEF[k]);
+  SYMS.clear();AREAS.clear();
+  document.querySelectorAll('.yb,.zb').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.cb').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('.dr').forEach(r=>r.classList.remove('done'));
+  ['sec-gtf','sec-v25','sec-cfm'].forEach(id=>{const s=document.getElementById(id);if(s)s.style.display='none';});
+  ['uv-result-q','uv-noavail-q','gtf-area-q','gtf-lim-q'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  render();updateProg();
+}
+function exportReport(){
+  let t='🐦 BIRD STRIKE REPORTE\n'+'='.repeat(40)+'\n';
+  t+='Fecha: '+new Date().toLocaleString('es-CL')+'\n';
+  t+='Motor: '+({'gtf':'PW1100G/GTF','v25':'V2500/IAE','cfm':'CFM56'}[Q.eng_type]||'No seleccionado')+'\n';
+  t+='Áreas: '+([...AREAS].join(', ')||'—')+'\n';
+  t+='Síntomas: '+([...SYMS].join(', ')||'—')+'\n';
+  t+='Clasificación: '+(classify()||'—').toUpperCase()+'\n';
+  if(Object.keys(DEF).length){t+='\nDIFERIDOS:\n';Object.values(DEF).forEach(d=>{t+=`  📌 ${d.title} — ${d.dl}\n     ${d.task}\n`;});}
+  const blob=new Blob([t],{type:'text/plain'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BS_'+new Date().toISOString().slice(0,10)+'.txt';a.click();
+}
+</script>
+
+
+</body></html>
