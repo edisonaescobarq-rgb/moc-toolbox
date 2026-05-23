@@ -386,9 +386,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
 
     <!-- BOTÓN EXPANDIR -->
     <div style="margin-top:10px;text-align:center">
-      <button onclick="tog('s6-detail');this.textContent=document.getElementById('s6-detail').classList.contains('open')?'▲ Ocultar detalle completo':'▼ Ver detalle completo con tasks'"
+      <button id="detailBtn"
+        onclick="const el=document.getElementById('s6-detail');el.classList.toggle('open');this.innerText=el.classList.contains('open')?'▲ Ocultar detalle completo':'▼ Ver detalle completo con tasks';"
         style="background:#0f3460;border:1px solid #2a3f6f;color:#4fc3f7;padding:6px 16px;border-radius:6px;font-size:0.73rem;cursor:pointer">
-        ▼ Ver detalle completo con tasks
+        ▲ Ocultar detalle completo
       </button>
     </div>
 
