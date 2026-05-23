@@ -383,6 +383,57 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
     <div class="dr"><div class="cb" onclick="chk(this,&#39;c5&#39;)"></div><div class="dt">Retraer flaps/slats · THS neutral · Reactivar SATCOM · Retirar plataformas</div></div>
     <div class="sl">Operational Tests — solo si daño en superficies de control</div>
     <div class="dr"><div class="cb red" onclick="chk(this,&#39;c6&#39;)"></div><div class="dt">Ailerones × 3 · Rudder × 3 · Elevators × 3 · THS × 3 · Spoilers × 3 · Flaps/Slats × 3</div></div>
+
+    <!-- BOTÓN EXPANDIR -->
+    <div style="margin-top:10px;text-align:center">
+      <button onclick="tog('s6-detail');this.textContent=document.getElementById('s6-detail').classList.contains('open')?'▲ Ocultar detalle completo':'▼ Ver detalle completo con tasks'"
+        style="background:#0f3460;border:1px solid #2a3f6f;color:#4fc3f7;padding:6px 16px;border-radius:6px;font-size:0.73rem;cursor:pointer">
+        ▼ Ver detalle completo con tasks
+      </button>
+    </div>
+
+    <!-- DETALLE COMPLETO — colapsado por defecto -->
+    <div class="sb" id="s6-detail" style="padding:0">
+
+      <div class="sl" style="margin-top:8px">Job Set-up — Detalle completo</div>
+      <div class="caut">⚠ Antes de trabajar cerca del radome: verificar que el radar NO esté operando (zona 5m/135° cada lado). Probes pueden estar calientes hasta 1h post-apagado.</div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd1')"></div><div class="dt">Desactivar SATCOM (si instalada) <span class="bdg b1">TASK 23-28-00-040-801-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd2')"></div><div class="dt">Desactivar Broadband antenna (si instalada) <span class="bdg b1">TASK 44-33-00-040-804-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd3')"></div><div class="dt">Calzos en posición en todos los trenes <span class="bdg b1">TASK 10-11-00-555-015-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd4')"></div><div class="dt">Safety devices instalados en trenes de aterrizaje <span class="bdg b1">TASK 32-00-00-481-001-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd5')"></div><div class="dt">Conectar tierra (earthing) al avión <span class="bdg b1">TASK 12-34-24-869-002-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd6')"></div><div class="dt">Energizar circuitos eléctricos desde external power o APU <span class="bdg b1">TASK 24-41-00-861-002-A / -A-01 / -A-02</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd7')"></div><div class="dt">Si puertas de tren estaban en tránsito o abiertas durante el bird strike: abrir puertas NLG <span class="bdg b1">TASK 32-22-00-010-001-A</span> y MLG <span class="bdg b1">TASK 32-12-00-010-001-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd8')"></div><div class="dt">Extender flaps y slats completamente <span class="bdg b1">TASK 27-50-00-866-008-A-01</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd9')"></div><div class="dt">THS: llevar pitch-trim control-wheel a posición full nose-up</div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd10')"></div><div class="dt">Despresurizar sistemas hidráulicos Green y Yellow <span class="bdg b1">TASK 29-23-00-864-001-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd11')"></div><div class="dt">Abrir radome <span class="bdg b1">TASK 53-15-11-010-001-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd12')"></div><div class="dt">Colocar WARNING NOTICE(S) en cabina: NO operar sistemas</div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd13')"></div><div class="dt">Posicionar plataforma 3M frente al nose. Instalar arnés de seguridad antes de subir.</div></div>
+
+      <div class="sl">Close-up — Detalle completo</div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd14')"></div><div class="dt">Verificar área limpia y libre de herramientas y objetos extraños</div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd15')"></div><div class="dt">Retirar WARNING NOTICE(S) de cabina</div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd16')"></div><div class="dt">Cerrar todos los paneles y puertas abiertos durante la inspección</div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd17')"></div><div class="dt">Cerrar radome <span class="bdg b1">TASK 53-15-11-410-001-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd18')"></div><div class="dt">Retraer spoilers (si extendidos) <span class="bdg b1">TASK 27-60-00-866-002-A</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd19')"></div><div class="dt">Retraer flaps y slats <span class="bdg b1">TASK 27-50-00-866-009-A-01</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd20')"></div><div class="dt">THS: llevar pitch-trim control-wheel a posición neutral</div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd21')"></div><div class="dt">Cerrar puertas NLG <span class="bdg b1">TASK 32-22-00-410-001-A</span> y MLG <span class="bdg b1">TASK 32-12-00-410-001-A</span> (si fueron abiertas)</div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd22')"></div><div class="dt">Reactivar SATCOM <span class="bdg b1">TASK 23-28-00-440-801-A</span> y Broadband antenna <span class="bdg b1">TASK 44-33-00-440-804-A</span> (si instaladas)</div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd23')"></div><div class="dt">Desenergizar circuitos eléctricos <span class="bdg b1">TASK 24-41-00-862-002-A / -A-01 / -A-02</span></div></div>
+      <div class="dr"><div class="cb" onclick="chk(this,'cd24')"></div><div class="dt">Retirar plataformas de acceso, equipos de soporte, herramientas y safety barriers</div></div>
+
+      <div class="sl">Operational Tests — Detalle</div>
+      <div class="note">💡 Solo si: (a) trabajo en el sistema, o (b) daño en estructura adyacente a superficies de control.</div>
+      <div class="dr"><div class="cb red" onclick="chk(this,'cd25')"></div><div class="dt">Operar ailerones × 3 <span class="bdg b1">TASK 27-14-00-710-001-A</span></div></div>
+      <div class="dr"><div class="cb red" onclick="chk(this,'cd26')"></div><div class="dt">Operar rudder × 3 <span class="bdg b1">TASK 27-24-00-710-002-A</span></div></div>
+      <div class="dr"><div class="cb red" onclick="chk(this,'cd27')"></div><div class="dt">Operar elevators × 3 <span class="bdg b1">TASK 27-34-00-710-001-A</span></div></div>
+      <div class="dr"><div class="cb red" onclick="chk(this,'cd28')"></div><div class="dt">Operar THS × 3 <span class="bdg b1">TASK 27-44-00-710-002-A</span></div></div>
+      <div class="dr"><div class="cb red" onclick="chk(this,'cd29')"></div><div class="dt">Operar spoilers × 3 <span class="bdg b1">TASK 27-64-00-710-001-A</span></div></div>
+      <div class="dr"><div class="cb red" onclick="chk(this,'cd30')"></div><div class="dt">Operar flaps y slats × 3 <span class="bdg b1">TASK 27-54-00-710-001-A + TASK 27-84-00-710-001-A</span></div></div>
+      <div class="dr"><div class="cb red" onclick="chk(this,'cd31')"></div><div class="dt">Retracción/extensión tren × 3 — solo si daño en puertas MLG o estructura adyacente <span class="bdg b1">TASK 32-30-00-867-001-A + TASK 32-30-00-867-002-A</span></div></div>
+    </div><!-- end s6-detail -->
   </div>
 </div>
 
