@@ -448,18 +448,44 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
     </div>
 
     <div class="sl">Zona de evidencia — Define alcance del BSI</div>
-    <div class="qr">
-      <div class="qt"><b>¿Hasta dónde llegó la evidencia?</b> Selecciona la zona más profunda
-        <div class="qref">Define exactamente qué BSI se requiere y si puede diferirse.</div>
+    <div class="nv25">Responde en orden. La zona se determina automáticamente.</div>
+    <div class="qr" id="v25-zq1">
+      <div class="qt"><b>P1.</b> ¿Hay restos orgánicos o daño en las <b>fan blades o liners acústicos</b>?
+        <div class="qref">Sangre, plumas, snarge, marcas de impacto en blades o liners</div>
       </div>
-      <div class="yw" style="flex-wrap:wrap;gap:6px">
-        <button class="zb opt" onclick="pickZ('v25_zone','z1',this)">🟢 <b>Zona 1 — Fan blades sin daño</b><small>Lo que entró no pasó de las fan blades. Sin daño en blades que supere límites, sin restos en liners acústicos.</small></button>
-        <button class="zb opt" onclick="pickZ('v25_zone','z2a',this)">🟡 <b>Zona 2A — Restos en liners o blades internas</b><small>Restos o daño en liners acústicos, o en suction side de las blades (&lt;50% span). El bird llegó hasta las blades pero no más adentro.</small></button>
-        <button class="zb opt" onclick="pickZ('v25_zone','z2b',this)">🟡 <b>Zona 2B — Fan blade fuera de límites</b><small>Fan blade con daño fuera de límites de servicio (crack, missing material, distorsión severa) en Área B.</small></button>
-        <button class="zb opt" onclick="pickZ('v25_zone','z3',this)">🟠 <b>Zona 3 — Pasó las blades, sin core</b><small>Restos o daño en OGV, FEGV struts, fan duct, FAV o TR inner wall. El bird pasó las fan blades pero sin evidencia de ingreso al core.</small></button>
-        <button class="zb opt" onclick="pickZ('v25_zone','z4',this)">🔴 <b>Zona 4 — Ingreso al core confirmado</b><small>Restos en LPC IGV, daño en LPC stages o HPC. El bird atravesó todo y llegó al compresor.</small></button>
+      <div class="yw">
+        <button class="yb yes" onclick="v25ZQ('q1','yes',this)">SÍ</button>
+        <button class="yb no" onclick="v25ZQ('q1','no',this)">NO → Zona 1</button>
       </div>
     </div>
+    <div class="qr" id="v25-zq2" style="display:none">
+      <div class="qt"><b>P2.</b> ¿El daño en fan blades <b>supera los límites de servicio</b>?
+        <div class="qref">Crack, missing material, distorsión severa — Ver AMM 72-31-11-601</div>
+      </div>
+      <div class="yw">
+        <button class="yb yes" onclick="v25ZQ('q2','yes',this)">SÍ → Zona 2B</button>
+        <button class="yb no" onclick="v25ZQ('q2','no',this)">NO</button>
+      </div>
+    </div>
+    <div class="qr" id="v25-zq3" style="display:none">
+      <div class="qt"><b>P3.</b> ¿Hay restos en <b>OGV, FEGV struts, fan duct o TR inner wall</b>?
+        <div class="qref">Evidencia de que el impacto pasó las fan blades hacia el flujo secundario</div>
+      </div>
+      <div class="yw">
+        <button class="yb yes" onclick="v25ZQ('q3','yes',this)">SÍ</button>
+        <button class="yb no" onclick="v25ZQ('q3','no',this)">NO → Zona 2A</button>
+      </div>
+    </div>
+    <div class="qr" id="v25-zq4" style="display:none">
+      <div class="qt"><b>P4.</b> ¿Hay restos en <b>LPC IGV, LPC stages o HPC</b>?
+        <div class="qref">Evidencia de ingreso al core (compresor de baja o alta presión)</div>
+      </div>
+      <div class="yw">
+        <button class="yb yes" onclick="v25ZQ('q4','yes',this)">SÍ → Zona 4</button>
+        <button class="yb no" onclick="v25ZQ('q4','no',this)">NO → Zona 3</button>
+      </div>
+    </div>
+    <div id="v25-zone-result" style="display:none;margin:8px 0;padding:9px 14px;border-radius:6px;border-left:4px solid #888;font-size:0.82rem;font-weight:700;background:#0f1f3a;color:#aaa"></div>
 
     <div class="qw v25" id="q-v25-blade-replaced" style="display:none">
       <div class="ql">🔴 ¿La fan blade con daño fuera de límites fue reemplazada?</div>
@@ -612,16 +638,18 @@ function pick(id,val,btn){
       document.querySelectorAll('#s4 .yb, #s4 .zb').forEach(b=>b.classList.remove('on'));
     }
     if(val==='cfm'){
-      ['uv_available','uv_found','visual_found','gtf_zone','area_a','blade_lim','probe_ok','gtf_fav','rotor','aohx','v25_zone','v25_blade_dmg','v25_blade_broken','v25_fav','v25_rotor','v25_bl_available','v25_bl_found','bleed_metal','v25_blade_replaced'].forEach(k=>delete Q[k]);
+      ['uv_available','uv_found','visual_found','gtf_zone','area_a','blade_lim','probe_ok','gtf_fav','rotor','aohx','v25_zone','v25_zq1','v25_zq2','v25_zq3','v25_zq4','v25_blade_dmg','v25_blade_broken','v25_fav','v25_rotor','v25_bl_available','v25_bl_found','bleed_metal','v25_blade_replaced'].forEach(k=>delete Q[k]);
       document.getElementById('sec-cfm').style.display='block';
+      resetV25ZoneFlow();
       document.querySelectorAll('#s5b .yb, #s5b .zb').forEach(b=>b.classList.remove('on'));
     }
     if(val==='gtf'){
       // Clear all V2500-specific variables
-      ['v25_zone','v25_blade_dmg','v25_fav','v25_rotor','v25_bl_available','v25_bl_found','bleed_metal','cfm_blade_dmg','cfm_booster_dmg','cfm_vib_ecam','cfm_rotor','cfm_zone'].forEach(k=>delete Q[k]);
+      ['v25_zone','v25_zq1','v25_zq2','v25_zq3','v25_zq4','v25_blade_dmg','v25_fav','v25_rotor','v25_bl_available','v25_bl_found','bleed_metal','cfm_blade_dmg','cfm_booster_dmg','cfm_vib_ecam','cfm_rotor','cfm_zone'].forEach(k=>delete Q[k]);
       const v25blEl=document.getElementById('v25-bl-result-q'); if(v25blEl) v25blEl.style.display='none';
       // Reset V2500 UI
       const fav=document.getElementById('v25-fav-q'); if(fav) fav.style.display='none';
+      resetV25ZoneFlow();
       document.querySelectorAll('#s5 .yb, #s5 .zb').forEach(b=>b.classList.remove('on'));
     }
   }
@@ -676,6 +704,63 @@ function pickZ(id,val,btn){
     if(brEl) brEl.style.display=showBladeReplaced?'block':'none';
     if(!showFAV) delete Q.v25_fav;
     if(!showBladeReplaced) delete Q.v25_blade_replaced;
+  }
+  render(); updateProg();
+}
+
+// ── V2500 SEQUENTIAL ZONE FLOW ──
+function resetV25ZoneFlow(){
+  ['v25-zq2','v25-zq3','v25-zq4'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el){ el.style.display='none'; el.querySelectorAll('.yb').forEach(function(b){b.classList.remove('on');}); }
+  });
+  document.querySelectorAll('#v25-zq1 .yb').forEach(function(b){b.classList.remove('on');});
+  var res=document.getElementById('v25-zone-result'); if(res) res.style.display='none';
+  ['v25_zq1','v25_zq2','v25_zq3','v25_zq4'].forEach(function(k){delete Q[k];});
+}
+function setV25Zone(val){
+  Q['v25_zone']=val;
+  var showFAV=val==='z3'||val==='z4';
+  var showBR=val==='z2b';
+  document.getElementById('v25-fav-q').style.display=showFAV?'block':'none';
+  var brEl=document.getElementById('q-v25-blade-replaced');
+  if(brEl) brEl.style.display=showBR?'block':'none';
+  if(!showFAV) delete Q.v25_fav;
+  if(!showBR) delete Q.v25_blade_replaced;
+  var labels={'z1':'🟢 Zona 1 — Fan blades sin daño','z2a':'🟡 Zona 2A — Restos en liners o blades','z2b':'🟡 Zona 2B — Fan blade fuera de límites','z3':'🟠 Zona 3 — Pasó las blades, sin core','z4':'🔴 Zona 4 — Ingreso al core confirmado'};
+  var clrs={'z1':'#2e7d32','z2a':'#f9a825','z2b':'#f9a825','z3':'#e65100','z4':'#e53935'};
+  var bgs={'z1':'#001a00','z2a':'#1a1200','z2b':'#1a1200','z3':'#1f0d00','z4':'#1f0000'};
+  var resEl=document.getElementById('v25-zone-result');
+  if(resEl){
+    resEl.style.display='block';
+    resEl.style.borderLeftColor=clrs[val];
+    resEl.style.background=bgs[val];
+    resEl.style.color=clrs[val];
+    resEl.textContent='Zona determinada: '+labels[val];
+  }
+}
+function v25ZQ(q,val,btn){
+  btn.closest('.yw').querySelectorAll('.yb').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  Q['v25_zq'+q.slice(1)]=val;
+  var hide=function(ids){ ids.forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.display='none'; el.querySelectorAll('.yb').forEach(function(b){b.classList.remove('on');}); } }); };
+  var show=function(id){ var el=document.getElementById(id); if(el) el.style.display='block'; };
+  var hideRes=function(){ var r=document.getElementById('v25-zone-result'); if(r) r.style.display='none'; };
+  if(q==='q1'){
+    hide(['v25-zq2','v25-zq3','v25-zq4']); delete Q.v25_zq2; delete Q.v25_zq3; delete Q.v25_zq4; delete Q.v25_zone;
+    if(val==='no'){ setV25Zone('z1'); }
+    else { show('v25-zq2'); hideRes(); }
+  } else if(q==='q2'){
+    hide(['v25-zq3','v25-zq4']); delete Q.v25_zq3; delete Q.v25_zq4; delete Q.v25_zone;
+    if(val==='yes'){ setV25Zone('z2b'); }
+    else { show('v25-zq3'); hideRes(); }
+  } else if(q==='q3'){
+    hide(['v25-zq4']); delete Q.v25_zq4; delete Q.v25_zone;
+    if(val==='no'){ setV25Zone('z2a'); }
+    else { show('v25-zq4'); hideRes(); }
+  } else if(q==='q4'){
+    delete Q.v25_zone;
+    setV25Zone(val==='yes'?'z4':'z3');
   }
   render(); updateProg();
 }
@@ -939,7 +1024,7 @@ function renderActions(level){
   if(gtfFAV||v25FAV){
     h+=grp('Flujo Secundario — FAV / Bleed Air Path');
     h+=card('war','🟠','Inspección FAV + Bleed Air Cold Flow Path',
-      '<b>Herramientas:</b> LIGHT SOURCE-WHITE + MIRROR-INSPECTION FLEXIBLE.<br><b>Inspeccionar:</b> (1) FAV scoop intake en TR · (2) FAV intake en TR inner wall · (3) FAV intake en bleed duct side · (4) Ducting entre FAV y firewall.<br><b>Si cracks, distorsión, missing components o bird strike signs → TASK 36-11-00-200-802-A obligatoria.</b>',
+      '<b>Herramientas:</b> LIGHT SOURCE-WHITE + MIRROR-INSPECTION FLEXIBLE.<br><b>Inspeccionar:</b> (1) FAV scoop intake en TR · (2) FAV intake en TR inner wall · (3) FAV intake en bleed duct side · (4) Ducting entre FAV y firewall.<br><b>Si cracks, distorsión, missing components o bird strike signs → TASK 36-11-00-200-002-A obligatoria.</b>',
       'Antes del próximo vuelo',isGTF?'TASK 36-11-00-200-802-A':'TASK 36-11-00-200-002-A','','');
   }
 
@@ -1029,7 +1114,7 @@ function renderActions(level){
         h+=card('ok','✅','Fan Blade V2500 — Reemplazada','Blade fuera de límites reemplazada. BSI diferible aplica a la blade nueva según los términos de Zona 2B.','','','','');
     } else if(v25Z==='z3'){
       h+=card('inf','🟠','BSI V2500 — No requerida · Zona 3 (flujo secundario)',
-        'OGV/fan duct/TR/FAV sin ingreso al core.<br><b>BSI LPC/HPC NO requerida</b> si FAV/OGV no muestran paso al core.<br>Inspección FAV + Bleed Path si FAV dañado.',
+        'BSI V2500 — No requerida. Evidencia limitada al flujo secundario (OGV / FEGV / fan duct / FAV / TR inner wall). Sin evidencia de ingreso al LPC o HPC. Continuar con la inspección del flujo secundario.',
         '','TASK 36-11-00-200-002-A','','');
     } else if(v25Z==='z1'&&Q.bleed_metal!=='yes'){
       h+=card('ok','✅','BSI V2500 — No Requerida · Zona 1','Solo inlet cowl / leading edge. Sin paso al compressor.<br>Si rub en fan track liner → TAP Test 10 FH / 5 FC.','','','','');
@@ -1339,9 +1424,10 @@ function resetAll(){
   document.querySelectorAll('.dr').forEach(r=>r.classList.remove('done'));
 
   document.getElementById('organic-engine-row')?.querySelectorAll('.yb').forEach(b=>b.classList.remove('on'));
-  ['gtf-area-q','gtf-lim-q','gtf-probe-q','gtf-fav-q','gtf-blade-lim-z3-q','gtf-broken-blade-q','v25-fav-q','uv-result-q','uv-noavail-q','v25-bl-result-q'].forEach(id=>{
+  ['gtf-area-q','gtf-lim-q','gtf-probe-q','gtf-fav-q','gtf-blade-lim-z3-q','gtf-broken-blade-q','v25-fav-q','uv-result-q','uv-noavail-q','v25-bl-result-q','v25-zq2','v25-zq3','v25-zq4','v25-zone-result'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
+  resetV25ZoneFlow();
   document.getElementById('sec-gtf').style.display='none';
   document.getElementById('sec-v25').style.display='none';
   document.getElementById('sec-cfm').style.display='none';
