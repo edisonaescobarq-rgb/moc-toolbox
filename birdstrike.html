@@ -1024,7 +1024,7 @@ function renderActions(level){
   if(gtfFAV||v25FAV){
     h+=grp('Flujo Secundario — FAV / Bleed Air Path');
     h+=card('war','🟠','Inspección FAV + Bleed Air Cold Flow Path',
-      '<b>Herramientas:</b> LIGHT SOURCE-WHITE + MIRROR-INSPECTION FLEXIBLE.<br><b>Inspeccionar:</b> (1) FAV scoop intake en TR · (2) FAV intake en TR inner wall · (3) FAV intake en bleed duct side · (4) Ducting entre FAV y firewall.<br><b>Si cracks, distorsión, missing components o bird strike signs → TASK 36-11-00-200-002-A obligatoria.</b>',
+      '<b>Herramientas:</b> LIGHT SOURCE-WHITE + MIRROR-INSPECTION FLEXIBLE.<br><b>Inspeccionar:</b> (1) FAV scoop intake en TR · (2) FAV intake en TR inner wall · (3) FAV intake en bleed duct side · (4) Ducting entre FAV y firewall.<br><b>Si se encuentran cracks, distorsión, missing components o evidencia de bird strike, efectuar el TASK 36-11-00-200-002-A.</b>',
       'Antes del próximo vuelo',isGTF?'TASK 36-11-00-200-802-A':'TASK 36-11-00-200-002-A','','');
   }
 
@@ -1114,7 +1114,7 @@ function renderActions(level){
         h+=card('ok','✅','Fan Blade V2500 — Reemplazada','Blade fuera de límites reemplazada. BSI diferible aplica a la blade nueva según los términos de Zona 2B.','','','','');
     } else if(v25Z==='z3'){
       h+=card('inf','🟠','BSI LPC/HPC — No requerida',
-        'La evidencia se limita al flujo secundario (OGV, FEGV struts, fan duct, FAV o TR inner wall), sin indicios de ingreso al LPC o HPC. Por lo tanto, no se requiere BSI del core. Continuar con la inspección del flujo secundario. La inspección del flujo secundario reemplaza la necesidad de una BSI LPC/HPC en este escenario.',
+        'La evidencia se limita al flujo secundario (OGV, FEGV struts, fan duct, FAV o TR inner wall), sin indicios de ingreso al LPC o HPC. Por lo tanto, no se requiere una BSI LPC/HPC en este escenario. Completar la inspección del flujo secundario conforme al TASK 36-11-00-200-002-A.',
         '','TASK 36-11-00-200-002-A','','');
     } else if(v25Z==='z1'&&Q.bleed_metal!=='yes'){
       h+=card('ok','✅','BSI V2500 — No Requerida · Zona 1','Solo inlet cowl / leading edge. Sin paso al compressor.<br>Si rub en fan track liner → TAP Test 10 FH / 5 FC.','','','','');
@@ -1243,7 +1243,7 @@ function renderActions(level){
       if(washImm){
         h+=card('imm','🚿','Compressor Wash — V2500 · Inmediato','Evento mayor o 2 motores. Realizar antes o al mismo tiempo que el BSI.','Antes del próximo vuelo / con BSI','TASK 72-00-00-100-010-A / -A-01 / -A-02','','');
       } else {
-        h+=card('def','🚿','Compressor Wash — V2500 · Diferible','Remover residuos orgánicos del gaspath para evitar adherencias y contaminación del compresor. Realizar tan pronto como sea operacionalmente posible.','25 h elapsed','TASK 72-00-00-100-010-A / -A-01 / -A-02','wash-v25','25 h elapsed');
+        h+=card('def','🚿','Compressor Wash — V2500 · Diferible','Remover residuos orgánicos del gaspath para evitar adherencias y contaminación interna del motor o del gas path. Realizar tan pronto como sea operacionalmente posible.','25 h elapsed','TASK 72-00-00-100-010-A / -A-01 / -A-02','wash-v25','25 h elapsed');
       }
     } else if(isV25&&Q.bleed_metal==='yes'){
       h+=card('ok','⬜','Compressor Wash V2500 — No aplica · Motor rechazado','Motor fuera de servicio por metal debris en bleed valve screen.','','','','');
