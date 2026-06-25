@@ -1113,8 +1113,8 @@ function renderActions(level){
       else if(Q.v25_blade_replaced==='yes')
         h+=card('ok','✅','Fan Blade V2500 — Reemplazada','Blade fuera de límites reemplazada. BSI diferible aplica a la blade nueva según los términos de Zona 2B.','','','','');
     } else if(v25Z==='z3'){
-      h+=card('inf','🟠','BSI V2500 — No requerida · Zona 3 (flujo secundario)',
-        'BSI V2500 — No requerida. Evidencia limitada al flujo secundario (OGV / FEGV / fan duct / FAV / TR inner wall). Sin evidencia de ingreso al LPC o HPC. Continuar con la inspección del flujo secundario.',
+      h+=card('inf','🟠','BSI V2500 — No requerida',
+        'La evidencia se limita al flujo secundario (OGV, FEGV struts, fan duct, FAV o TR inner wall), sin indicios de ingreso al LPC o HPC. Por lo tanto, no se requiere BSI del core. Continuar con la inspección del flujo secundario.',
         '','TASK 36-11-00-200-002-A','','');
     } else if(v25Z==='z1'&&Q.bleed_metal!=='yes'){
       h+=card('ok','✅','BSI V2500 — No Requerida · Zona 1','Solo inlet cowl / leading edge. Sin paso al compressor.<br>Si rub en fan track liner → TAP Test 10 FH / 5 FC.','','','','');
