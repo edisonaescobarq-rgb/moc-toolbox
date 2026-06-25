@@ -931,6 +931,7 @@ function renderActions(level){
   const gtfZ=Q.gtf_zone||null, v25Z=Q.v25_zone||null, cfmZ=Q.cfm_zone||null;
   const gtfImm=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||Q.blade_lim==='no'||Q.blade_lim_z3==='no'||is2||gtfZ==='z4';
   const v25Imm=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||is2||v25Z==='z4';
+  const v25BladeNotReplaced=isV25&&v25Z==='z2b'&&Q.v25_blade_replaced==='no';
 
   // ── ENGINE AFFECTED ──
   const engineDirectEvidence = AREAS.has('engine') ||
@@ -1106,10 +1107,14 @@ function renderActions(level){
       h+=card('def','🟡','BSI LPC IGV + LPC stages — Diferible · 1 motor · Zona 2B (V2500)',
         '<b>Área B fuera de límites.</b> LPC IGV + LPC stages 1.5/2.5.<br><b>Si LPC limpio → STOP. HPC stages 3/6 NO requerida.</b><br>Si LPC con daño → HPC stages 3/6.<br><b>⚠ Si BSI confirma evidencia en LP o HP compressor → programar Stage 3 Clapper cada 750 FC por mín. 2100 FC (TASK 72-00-00-210-012-A).</b>',
         '10 FH o 2 FC','TASK 72-32-91-200-010-B + TASK 72-00-00-200-017-B','bsi-v25-2b','10 FH / 2 FC');
-      if(Q.v25_blade_replaced==='no')
-        h+=card('imm','🔴','Fan Blade V2500 — REEMPLAZAR ANTES DE VOLAR',
+      if(Q.v25_blade_replaced==='no'){
+        h+=card('imm','🔴','Fan Blade V2500 — REEMPLAZAR ANTES DEL PRÓXIMO VUELO',
           'Blade con daño fuera de límites de servicio (Área B). No puede volar instalada independientemente de la BSI diferible. Reemplazar antes del próximo vuelo.',
           'ANTES DEL PRÓXIMO VUELO','TASK 72-31-11-000-010-B (Removal) · TASK 72-31-11-400-010-C (Installation)','','');
+        h+=card('imm','⛔','NO RTS — Fan blade fuera de límites de servicio',
+          'Reemplazar antes del próximo vuelo.',
+          'ANTES DEL PRÓXIMO VUELO','','','');
+      }
       else if(Q.v25_blade_replaced==='yes')
         h+=card('ok','✅','Fan Blade V2500 — Reemplazada','Blade fuera de límites reemplazada. BSI diferible aplica a la blade nueva según los términos de Zona 2B.','','','','');
     } else if(v25Z==='z3'){
@@ -1162,9 +1167,9 @@ function renderActions(level){
   if(!isGTF&&!isV25&&!isCFM) h+=card('inf','ℹ️','BSI — Selecciona tipo de motor','Selecciona el motor en Sección 1.','','','','');
 
   // ── TAP TEST V2500 ──
-  if(isV25&&Q.v25_blade_dmg==='yes'&&Q.v25_rotor!=='no'&&Q.bleed_metal!=='yes'){
+  if(isV25&&Q.v25_blade_dmg==='yes'&&Q.v25_rotor!=='no'&&Q.bleed_metal!=='yes'&&!v25BladeNotReplaced){
     h+=grp('V2500 — TAP Test');
-    h+=card('def','🔵','TAP Test Fan Blades (V2500)','Daño en fan blades <b>o indicación de rub grande en fan track liner</b>. Transient Acoustic Propagation test en el set completo de fan blades.<br>No requerido si hay indicación de bird strike sin daño en fan blades.','10 FH o 5 FC','TASK 72-00-00-200-011-A','tap-test','10 FH / 5 FC');
+    h+=card('def','🔵','TAP Test Fan Blades (V2500)','Requerido cuando existe daño en fan blades o rub significativo del fan track liner. Transient Acoustic Propagation test en el set completo de fan blades.<br>No requerido si hay indicación de bird strike sin daño en fan blades.','10 FH o 5 FC','TASK 72-00-00-200-011-A','tap-test','10 FH / 5 FC');
   }
 
   // ── BLACK LIGHT ──
@@ -1177,7 +1182,7 @@ function renderActions(level){
       '','TASK 72-00-00-210-807-A-01','','');
   } else if(isCFM){
     h+=card('ok','⬜','Black Light — CFM56 · No aplica','El AMM TASK 72-00-00-200-006-A no incluye Black Light borescope para CFM56/LEAP. No requerida.','','','','');
-  } else if(isV25){
+  } else if(isV25&&!v25BladeNotReplaced){
     const v25blAvail = Q.v25_bl_available;
     const v25blFound = Q.v25_bl_found;
     if(!v25blAvail){
@@ -1188,7 +1193,7 @@ function renderActions(level){
         'Realizar en próxima base capacitada dentro del plazo.',
         '10 FH o 2 FC','TASK 05-51-14-200-803-A §U · TASK 72-00-00-200-010-A','bl-v25-deferred','10 FH / 2 FC');
     } else if(v25blAvail==='yes'&&!v25blFound){
-      h+=card('inf','🔦','Black Light — V2500 · Indica resultado','Responde el resultado de la Black Light en la Sección Motor V2500.','','TASK 05-51-14-200-803-A §U · TASK 72-00-00-200-010-A','','');
+      h+=card('inf','🔦','Black Light — V2500 · Indica resultado','Disponible en esta base. Completar la inspección con luz ultravioleta según TASK 05-51-14-200-803-A §U antes del próximo vuelo.','','TASK 05-51-14-200-803-A §U · TASK 72-00-00-200-010-A','','');
     } else if(v25blAvail==='yes'&&v25blFound==='yes'){
       h+=card('imm','🔦','Black Light V2500 — Material orgánico detectado · BSI REQUERIDA',
         '<b>Material orgánico detectado en LPC Fan Blades o LPC IGV.</b><br>'+
@@ -1239,7 +1244,7 @@ function renderActions(level){
       else h+=card('ok','⬜','Engine Wash GTF — No aplica · Motor rechazado','Rotor no gira. Motor fuera de servicio — engine wash no requerida.','','','','');
       }
     }
-    if(isV25&&Q.bleed_metal!=='yes'){
+    if(isV25&&Q.bleed_metal!=='yes'&&!v25BladeNotReplaced){
       if(washImm){
         h+=card('imm','🚿','Compressor Wash — V2500 · Inmediato','Evento mayor o 2 motores. Realizar antes o al mismo tiempo que el BSI.','Antes del próximo vuelo / con BSI','TASK 72-00-00-100-010-A / -A-01 / -A-02','','');
       } else {
@@ -1259,6 +1264,7 @@ function renderActions(level){
 function renderRTS(level){
   const box=document.getElementById('rts'), body=document.getElementById('rts-body');
   if(!level){ box.classList.remove('show'); return; }
+  if(Q.v25_zone==='z2b'&&Q.v25_blade_replaced==='no'){ box.classList.remove('show'); return; }
   box.classList.add('show');
 
   const isGTF=Q.eng_type==='gtf', isV25=Q.eng_type==='v25';
@@ -1334,7 +1340,7 @@ function renderRTS(level){
   }
   if(isV25){
     if((v25ZRTS==='z2a'||v25ZRTS==='z2b')&&!hasCritRTS&&!is2RTS&&!DEF['bsi-v25-2a']&&!DEF['bsi-v25-2b'])
-      implicitDefs.push({title:`BSI LPC IGV + LPC + HPC 3/6 — V2500 · Zona ${v25ZRTS==='z2a'?'2A':'2B'}`,dl:'10 FH / 2 FC',task:'TASK 72-32-91-200-010-B'});
+      implicitDefs.push({title:`${v25ZRTS==='z2a'?'BSI LPC IGV + LPC + HPC 3/6':'BSI LPC IGV + LPC stages'} — V2500 · Zona ${v25ZRTS==='z2a'?'2A':'2B'}`,dl:'10 FH / 2 FC',task:'TASK 72-32-91-200-010-B'});
     if(Q.v25_bl_available==='no'&&Q.bleed_metal!=='yes'&&!DEF['bl-v25-deferred'])
       implicitDefs.push({title:'Black Light — V2500 · No disponible en base',dl:'10 FH / 2 FC',task:'TASK 05-51-14-200-803-A §U'});
     if(!washImmRTS&&Q.bleed_metal!=='yes'&&(AREAS.has('engine')||Q.organic==='yes'||organicRTS)&&!DEF['wash-v25'])
