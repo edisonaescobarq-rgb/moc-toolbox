@@ -447,7 +447,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
       </div>
     </div>
 
-    <div class="sl">Zona de evidencia — Define alcance del BSI</div>
+    <div class="sl">Clasificación de la evidencia — Define alcance del BSI</div>
     <div class="nv25">Responde en orden. La zona se determina automáticamente.</div>
     <div class="qr" id="v25-zq1">
       <div class="qt"><b>P1.</b> ¿Hay restos orgánicos o daño en las <b>fan blades o liners acústicos</b>?
@@ -1114,7 +1114,7 @@ function renderActions(level){
         h+=card('ok','✅','Fan Blade V2500 — Reemplazada','Blade fuera de límites reemplazada. BSI diferible aplica a la blade nueva según los términos de Zona 2B.','','','','');
     } else if(v25Z==='z3'){
       h+=card('inf','🟠','BSI LPC/HPC — No requerida',
-        'La evidencia se limita al flujo secundario (OGV, FEGV struts, fan duct, FAV o TR inner wall), sin indicios de ingreso al LPC o HPC. Por lo tanto, no se requiere BSI del core. Continuar con la inspección del flujo secundario.',
+        'La evidencia se limita al flujo secundario (OGV, FEGV struts, fan duct, FAV o TR inner wall), sin indicios de ingreso al LPC o HPC. Por lo tanto, no se requiere BSI del core. Continuar con la inspección del flujo secundario. La inspección del flujo secundario reemplaza la necesidad de una BSI LPC/HPC en este escenario.',
         '','TASK 36-11-00-200-002-A','','');
     } else if(v25Z==='z1'&&Q.bleed_metal!=='yes'){
       h+=card('ok','✅','BSI V2500 — No Requerida · Zona 1','Solo inlet cowl / leading edge. Sin paso al compressor.<br>Si rub en fan track liner → TAP Test 10 FH / 5 FC.','','','','');
@@ -1243,7 +1243,7 @@ function renderActions(level){
       if(washImm){
         h+=card('imm','🚿','Compressor Wash — V2500 · Inmediato','Evento mayor o 2 motores. Realizar antes o al mismo tiempo que el BSI.','Antes del próximo vuelo / con BSI','TASK 72-00-00-100-010-A / -A-01 / -A-02','','');
       } else {
-        h+=card('def','🚿','Compressor Wash — V2500 · Diferible','Remover restos del gaspath lo antes posible.','25 h elapsed','TASK 72-00-00-100-010-A / -A-01 / -A-02','wash-v25','25 h elapsed');
+        h+=card('def','🚿','Compressor Wash — V2500 · Diferible','Remover residuos orgánicos del gaspath para evitar adherencias y contaminación del compresor. Realizar tan pronto como sea operacionalmente posible.','25 h elapsed','TASK 72-00-00-100-010-A / -A-01 / -A-02','wash-v25','25 h elapsed');
       }
     } else if(isV25&&Q.bleed_metal==='yes'){
       h+=card('ok','⬜','Compressor Wash V2500 — No aplica · Motor rechazado','Motor fuera de servicio por metal debris en bleed valve screen.','','','','');
@@ -1336,7 +1336,7 @@ function renderRTS(level){
     if((v25ZRTS==='z2a'||v25ZRTS==='z2b')&&!hasCritRTS&&!is2RTS&&!DEF['bsi-v25-2a']&&!DEF['bsi-v25-2b'])
       implicitDefs.push({title:`BSI LPC+HPC — V2500 · Zona ${v25ZRTS==='z2a'?'2A':'2B'}`,dl:'10 FH / 2 FC',task:'TASK 72-32-91-200-010-B'});
     if(Q.v25_bl_available==='no'&&Q.bleed_metal!=='yes'&&!DEF['bl-v25-deferred'])
-      implicitDefs.push({title:'Black Light LPC — V2500 · No disponible en base',dl:'10 FH / 2 FC',task:'TASK 05-51-14-200-803-A §U'});
+      implicitDefs.push({title:'Black Light — V2500 · No disponible en base',dl:'10 FH / 2 FC',task:'TASK 05-51-14-200-803-A §U'});
     if(!washImmRTS&&Q.bleed_metal!=='yes'&&(AREAS.has('engine')||Q.organic==='yes'||organicRTS)&&!DEF['wash-v25'])
       implicitDefs.push({title:'Compressor Wash — V2500',dl:'25 h elapsed',task:'TASK 72-00-00-100-010-A'});
     if(Q.v25_blade_dmg==='yes'&&Q.v25_rotor!=='no'&&!DEF['tap-test'])
