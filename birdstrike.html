@@ -727,7 +727,7 @@ function setV25Zone(val){
   if(brEl) brEl.style.display=showBR?'block':'none';
   if(!showFAV) delete Q.v25_fav;
   if(!showBR) delete Q.v25_blade_replaced;
-  var labels={'z1':'🟢 Zona 1 — Fan blades sin daño','z2a':'🟡 Zona 2A — Restos en liners o blades','z2b':'🟡 Zona 2B — Fan blade fuera de límites','z3':'🟠 Zona 3 — Pasó las blades, sin core','z4':'🔴 Zona 4 — Ingreso al core confirmado'};
+  var labels={'z1':'🟢 Zona 1 — Fan blades sin daño','z2a':'🟡 Zona 2A — Restos en liners o blades','z2b':'🟡 Zona 2B — Fan blade fuera de límites','z3':'🟠 Zona 3 — Evidencia limitada al flujo secundario. El impacto pasó las fan blades, con restos o daño en OGV, FEGV struts, fan duct, FAV o TR inner wall, sin evidencia de ingreso al LPC o HPC.','z4':'🔴 Zona 4 — Ingreso al core confirmado'};
   var clrs={'z1':'#2e7d32','z2a':'#f9a825','z2b':'#f9a825','z3':'#e65100','z4':'#e53935'};
   var bgs={'z1':'#001a00','z2a':'#1a1200','z2b':'#1a1200','z3':'#1f0d00','z4':'#1f0000'};
   var resEl=document.getElementById('v25-zone-result');
@@ -1113,7 +1113,7 @@ function renderActions(level){
       else if(Q.v25_blade_replaced==='yes')
         h+=card('ok','✅','Fan Blade V2500 — Reemplazada','Blade fuera de límites reemplazada. BSI diferible aplica a la blade nueva según los términos de Zona 2B.','','','','');
     } else if(v25Z==='z3'){
-      h+=card('inf','🟠','BSI V2500 — No requerida',
+      h+=card('inf','🟠','BSI LPC/HPC — No requerida',
         'La evidencia se limita al flujo secundario (OGV, FEGV struts, fan duct, FAV o TR inner wall), sin indicios de ingreso al LPC o HPC. Por lo tanto, no se requiere BSI del core. Continuar con la inspección del flujo secundario.',
         '','TASK 36-11-00-200-002-A','','');
     } else if(v25Z==='z1'&&Q.bleed_metal!=='yes'){
