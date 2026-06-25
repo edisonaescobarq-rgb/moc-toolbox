@@ -1243,7 +1243,7 @@ function renderActions(level){
       if(washImm){
         h+=card('imm','🚿','Compressor Wash — V2500 · Inmediato','Evento mayor o 2 motores. Realizar antes o al mismo tiempo que el BSI.','Antes del próximo vuelo / con BSI','TASK 72-00-00-100-010-A / -A-01 / -A-02','','');
       } else {
-        h+=card('def','🚿','Compressor Wash — V2500 · Diferible','Remover residuos orgánicos del gaspath para evitar adherencias y contaminación interna del motor o del gas path. Realizar tan pronto como sea operacionalmente posible.','25 h elapsed','TASK 72-00-00-100-010-A / -A-01 / -A-02','wash-v25','25 h elapsed');
+        h+=card('def','🚿','Compressor Wash — V2500 · Diferible','Remover residuos orgánicos del gas path para minimizar adherencias, contaminación interna del motor y posibles olores residuales. Realizar tan pronto como sea operacionalmente posible.','25 h elapsed','TASK 72-00-00-100-010-A / -A-01 / -A-02','wash-v25','25 h elapsed');
       }
     } else if(isV25&&Q.bleed_metal==='yes'){
       h+=card('ok','⬜','Compressor Wash V2500 — No aplica · Motor rechazado','Motor fuera de servicio por metal debris en bleed valve screen.','','','','');
