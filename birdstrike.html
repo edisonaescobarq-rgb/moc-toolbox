@@ -1173,7 +1173,7 @@ function renderActions(level){
   }
 
   // ── BLACK LIGHT ──
-  if(!(isGTF&&Q.rotor==='no')&&!(isV25&&Q.bleed_metal==='yes')) h+=grp('Black Light (Luz Negra)');
+  if(!(isGTF&&Q.rotor==='no')&&!(isV25&&Q.bleed_metal==='yes')&&!v25BladeNotReplaced) h+=grp('Black Light (Luz Negra)');
   if(isGTF){
     if(Q.rotor!=='no') h+=card('ok','⬜','Black Light GTF — Inspección Visual Inlet',
       'La LIGHT SOURCE ULTRA-VIOLET se usa opcionalmente en la inspección visual del inlet para identificar snarge (fluoresce en verde). '+
@@ -1225,7 +1225,7 @@ function renderActions(level){
   // ── V2500 STAGE 3 CLAPPER ──
 
   // ── ENGINE WASH ──
-  if(AREAS.has('engine')||Q.organic==='yes'||Q.smell==='yes'||Q.uv_found==='yes'||Q.visual_found==='yes'||v25Z==='z2a'||v25Z==='z2b'||v25Z==='z3'||v25Z==='z4'){
+  if(!v25BladeNotReplaced&&(AREAS.has('engine')||Q.organic==='yes'||Q.smell==='yes'||Q.uv_found==='yes'||Q.visual_found==='yes'||v25Z==='z2a'||v25Z==='z2b'||v25Z==='z3'||v25Z==='z4')){
     h+=grp('Engine Wash');
     const washImm = hasCrit||is2||gtfZ==='z4'||v25Z==='z4';
     if(isCFM){
