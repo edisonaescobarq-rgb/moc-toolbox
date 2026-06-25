@@ -468,7 +468,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
       </div>
     </div>
     <div class="qr" id="v25-zq3" style="display:none">
-      <div class="qt"><b>P3.</b> ¿Hay restos en <b>OGV, FEGV struts, fan duct o TR inner wall</b>?
+      <div class="qt"><b>P3.</b> ¿Hay restos o daño en <b>OGV, FEGV struts, fan duct o TR inner wall</b>?
         <div class="qref">Evidencia de que el impacto pasó las fan blades hacia el flujo secundario</div>
       </div>
       <div class="yw">
@@ -727,7 +727,7 @@ function setV25Zone(val){
   if(brEl) brEl.style.display=showBR?'block':'none';
   if(!showFAV) delete Q.v25_fav;
   if(!showBR) delete Q.v25_blade_replaced;
-  var labels={'z1':'🟢 Zona 1 — Fan blades sin daño','z2a':'🟡 Zona 2A — Restos en liners o blades','z2b':'🟡 Zona 2B — Fan blade fuera de límites','z3':'🟠 Zona 3 — Evidencia limitada al flujo secundario. El impacto pasó las fan blades, con restos o daño en OGV, FEGV struts, fan duct, FAV o TR inner wall, sin evidencia de ingreso al LPC o HPC.','z4':'🔴 Zona 4 — Ingreso al core confirmado'};
+  var labels={'z1':'🟢 Zona 1 — Sin evidencia de daño más allá del inlet. El impacto no dejó restos ni daño en fan blades, liners acústicos ni estructuras más profundas.','z2a':'🟡 Zona 2A — Evidencia limitada a fan blades o liners acústicos. Restos orgánicos o daño dentro de límites de servicio en fan blades o acoustic liners, sin evidencia de propagación al flujo secundario (OGV/FEGV/fan duct/TR) ni ingreso al LPC o HPC.','z2b':'🟡 Zona 2B — Fan blade con daño fuera de límites de servicio. Crack, missing material o distorsión severa en Área B. Requiere remoción antes del próximo vuelo.','z3':'🟠 Zona 3 — Evidencia limitada al flujo secundario. El impacto pasó las fan blades, con restos o daño en OGV, FEGV struts, fan duct, FAV o TR inner wall, sin evidencia de ingreso al LPC o HPC.','z4':'🔴 Zona 4 — Evidencia de ingreso al core confirmado. Restos o daño en LPC IGV, LPC stages o HPC. BSI inmediata obligatoria antes del próximo vuelo.'};
   var clrs={'z1':'#2e7d32','z2a':'#f9a825','z2b':'#f9a825','z3':'#e65100','z4':'#e53935'};
   var bgs={'z1':'#001a00','z2a':'#1a1200','z2b':'#1a1200','z3':'#1f0d00','z4':'#1f0000'};
   var resEl=document.getElementById('v25-zone-result');
@@ -1100,7 +1100,7 @@ function renderActions(level){
         'ANTES DEL PRÓXIMO VUELO','TASK 72-32-91-200-010-B + TASK 72-00-00-200-017-B + TASK 72-00-00-200-016-B','','');
     } else if(v25Z==='z2a'&&Q.bleed_metal!=='yes'){
       h+=card('def','🟡','BSI LPC IGV + LPC + HPC 3/6 — Diferible · 1 motor · Zona 2A (V2500)',
-        '<b>Área A.</b> LPC IGV + LPC stages 1.5/2.5 + HPC stages 3/6.<br>Si daño HPC → etapas restantes.<br><b>⚠ Si BSI confirma evidencia en LP o HP compressor → programar Stage 3 Clapper cada 750 FC por mín. 2100 FC (TASK 72-00-00-210-012-A).</b>',
+        '<b>Área A (fan blade damage dentro de límites).</b> LPC IGV + LPC stages 1.5/2.5 + HPC stages 3/6.<br>Si daño HPC → etapas restantes.<br><b>⚠ Si BSI confirma evidencia en LP o HP compressor → programar Stage 3 Clapper cada 750 FC por mín. 2100 FC (TASK 72-00-00-210-012-A).</b>',
         '10 FH o 2 FC','TASK 72-32-91-200-010-B + TASK 72-00-00-200-017-B + TASK 72-00-00-200-016-B','bsi-v25-2a','10 FH / 2 FC');
     } else if(v25Z==='z2b'&&Q.bleed_metal!=='yes'){
       h+=card('def','🟡','BSI LPC IGV + LPC stages — Diferible · 1 motor · Zona 2B (V2500)',
@@ -1334,7 +1334,7 @@ function renderRTS(level){
   }
   if(isV25){
     if((v25ZRTS==='z2a'||v25ZRTS==='z2b')&&!hasCritRTS&&!is2RTS&&!DEF['bsi-v25-2a']&&!DEF['bsi-v25-2b'])
-      implicitDefs.push({title:`BSI LPC+HPC — V2500 · Zona ${v25ZRTS==='z2a'?'2A':'2B'}`,dl:'10 FH / 2 FC',task:'TASK 72-32-91-200-010-B'});
+      implicitDefs.push({title:`BSI LPC IGV + LPC + HPC 3/6 — V2500 · Zona ${v25ZRTS==='z2a'?'2A':'2B'}`,dl:'10 FH / 2 FC',task:'TASK 72-32-91-200-010-B'});
     if(Q.v25_bl_available==='no'&&Q.bleed_metal!=='yes'&&!DEF['bl-v25-deferred'])
       implicitDefs.push({title:'Black Light — V2500 · No disponible en base',dl:'10 FH / 2 FC',task:'TASK 05-51-14-200-803-A §U'});
     if(!washImmRTS&&Q.bleed_metal!=='yes'&&(AREAS.has('engine')||Q.organic==='yes'||organicRTS)&&!DEF['wash-v25'])
