@@ -338,7 +338,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
       </div>
       <div class="yw" style="flex-wrap:wrap;gap:6px">
         <button class="zb opt" onclick="pickZ('gtf_zone','z1',this)">🟢 <b>Zona 1 — Fan blades sin daño</b><small>Lo que entró no pasó de las fan blades. Sin daño en blades ni restos en liners acústicos.</small></button>
-        <button class="zb opt" onclick="pickZ('gtf_zone','z2',this)">🟡 <b>Zona 2 — Restos o daño en fan blades</b><small>Restos o daño en fan blades (Área A o B), suction side o annulus fillers. El bird llegó a las blades.</small></button>
+        <button class="zb opt" onclick="pickZ('gtf_zone','z2',this)">🟡 <b>Zona 2 — Restos o daño en fan blades</b><small>Evidencia limitada a fan blades o annulus fillers. Restos orgánicos o daño en fan blades (Área A o Área B), suction side o annulus fillers, sin evidencia de propagación al rear fan, fan duct o core.</small></button>
         <button class="zb opt" onclick="pickZ('gtf_zone','z3',this)">🟠 <b>Zona 3 — Pasó las blades, sin core</b><small>Restos o daño en rear fan blades, OGV, fan duct, FAV o TR inner wall. Sin evidencia de ingreso al core.</small></button>
         <button class="zb opt" onclick="pickZ('gtf_zone','z4',this)">🔴 <b>Zona 4 — Ingreso al core confirmado</b><small>Restos en HPC, combustor o HPT. El bird atravesó todo y llegó al core del motor.</small></button>
       </div>
@@ -1046,6 +1046,11 @@ function renderActions(level){
       h+=card('imm','🔴','BSI LPC — INMEDIATA · No Diferible (GTF)',
         `<b>Razón: ${r.join(' · ')}</b><br>Secuencia: LPC → si debris → HPC → HPT/Combustor → LPT.<br><b>Si LPC limpio → STOP.</b>`,
         'ANTES DEL PRÓXIMO VUELO','TASK 72-31-00-290-802-A/-A-01 → 72-35-00-290-801-A → 72-41-00-290-802-A → 72-53-00-200-801-A','','');
+      if(Q.blade_lim==='no'||Q.blade_lim_z3==='no'){
+        h+=card('imm','🔴','Fan Blade GTF — Acción Correctiva Requerida',
+          'Fan blade fuera de límites de servicio.<br>Corregir conforme AMM antes del próximo vuelo.<br>Dependiendo del daño puede requerirse: Blend · Replacement · Balance · Inspecciones posteriores.',
+          'ANTES DEL PRÓXIMO VUELO','','','');
+      }
     } else if((gtfZ==='z2'||Q.area_a==='yes')&&Q.rotor!=='no'){
       // Zone 2: fan blade damage → BSI LPC deferred (only if rotor turns)
       h+=card('def','🟡','BSI LPC — Diferible · 1 motor · Zona 2 (GTF)',
@@ -1240,7 +1245,7 @@ function renderActions(level){
       if(washImm){
         h+=card('imm','🚿','Engine Wash — GTF · Inmediato','Evento mayor o 2 motores. Realizar antes o al mismo tiempo que el BSI para remover restos del gaspath y facilitar la inspección.','Antes del próximo vuelo / con BSI','TASK 72-00-00-100-802-A','','');
       } else {
-        if(Q.rotor!=='no') h+=card('def','🚿','Engine Wash — GTF · Diferible','Limpiar gaspath. Hacer lo antes posible — con más tiempo operado se hace más difícil limpiar.','25 FH o 10 FC','TASK 72-00-00-100-802-A','wash-gtf','25 FH / 10 FC');
+        if(Q.rotor!=='no') h+=card('def','🚿','Engine Wash — GTF · Diferible','Remover residuos orgánicos del gas path para minimizar contaminación interna y facilitar la eliminación de restos biológicos. Realizar tan pronto como sea operacionalmente posible.','25 FH o 10 FC','TASK 72-00-00-100-802-A','wash-gtf','25 FH / 10 FC');
       else h+=card('ok','⬜','Engine Wash GTF — No aplica · Motor rechazado','Rotor no gira. Motor fuera de servicio — engine wash no requerida.','','','','');
       }
     }
@@ -1303,7 +1308,7 @@ function renderRTS(level){
     if(Q.cfm_blade_dmg==='yes'&&!cfmAbnormalRTS) criteria.push({l:'CFM56 — Missing material en fan blades: BSI inmediata requerida antes del próximo vuelo',ok:false});
   }
   if(isGTF){
-    if(Q.blade_lim==='no'||Q.blade_lim_z3==='no') criteria.push({l:'Fan blades GTF — fuera de límites (requiere acción/remapping)',ok:false});
+    if(Q.blade_lim==='no'||Q.blade_lim_z3==='no') criteria.push({l:'❌ Fan blade fuera de límites de servicio — Requiere corrección conforme AMM antes del próximo vuelo',ok:false});
     if(Q.blade_broken==='yes') criteria.push({l:'Fan blade GTF — broken/missing (TASK 05-51-26 requerida)',ok:false});
     if(Q.aohx==='yes')
       criteria.push({l:'AOHX obstruido (requiere reemplazo)',ok:false});
@@ -1329,7 +1334,7 @@ function renderRTS(level){
   if(engineAffectedRTS){
   if(isGTF){
     // Black Light GTF: solo inmediata por condición crítica — sin diferido implícito (sin respaldo AMM para diferimiento)
-    if((gtfZRTS==='z2'||Q.area_a==='yes')&&!hasCritRTS&&!is2RTS&&Q.rotor!=='no'&&!DEF['bsi-gtf'])
+    if((gtfZRTS==='z2'||Q.area_a==='yes')&&!hasCritRTS&&!is2RTS&&Q.rotor!=='no'&&Q.blade_lim!=='no'&&Q.blade_lim_z3!=='no'&&!DEF['bsi-gtf'])
       implicitDefs.push({title:'BSI LPC — GTF · Zona 2',dl:'10 FH / 2 FC',task:'TASK 72-31-00-290-802-A'});
     if(!washImmRTS&&Q.rotor!=='no'&&(AREAS.has('engine')||Q.organic==='yes'||Q.smell==='yes'||organicRTS)&&!DEF['wash-gtf'])
       implicitDefs.push({title:'Engine Wash — GTF',dl:'25 FH / 10 FC',task:'TASK 72-00-00-100-802-A'});
