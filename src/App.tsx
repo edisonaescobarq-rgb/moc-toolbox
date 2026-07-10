@@ -4058,7 +4058,7 @@ function BirdStrikeModule() {
         <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)" }}>AMM 05-51-14-200-803-A · Rev 52 · V2500 + GTF + CFM56</div>
       </div>
       <iframe
-        src="/birdstrike.html"
+        src={`${import.meta.env.BASE_URL}birdstrike.html`}
         style={{ flex: 1, border: "none", width: "100%" }}
         title="Bird Strike Checklist"
       />
