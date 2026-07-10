@@ -1044,17 +1044,17 @@ function renderActions(level){
       if(Q.smell==='yes') r.push('olor ave cocida'); if(Q.ecam==='yes') r.push('ECAM');
       if(Q.blade_lim==='no'||Q.blade_lim_z3==='no') r.push('fan blade fuera de límites'); if(is2) r.push('2 motores'); if(gtfZ==='z4') r.push('Zona 4 core');
       h+=card('imm','🔴','BSI LPC — INMEDIATA · No Diferible (GTF)',
-        `<b>Razón: ${r.join(' · ')}</b><br>Secuencia: LPC → si debris → HPC → HPT/Combustor → LPT.<br><b>Si LPC limpio → STOP.</b>`,
+        `<b>Razón: ${r.join(' · ')}</b><br>Secuencia: LPC → si hay evidencia de restos de ave o daño nuevo → HPC → si hay evidencia de restos de ave o daño nuevo → HPT/Combustor → LPT.<br><b>Si LPC limpio → STOP.</b>`,
         'ANTES DEL PRÓXIMO VUELO','TASK 72-31-00-290-802-A/-A-01 → 72-35-00-290-801-A → 72-41-00-290-802-A → 72-53-00-200-801-A','','');
       if(Q.blade_lim==='no'||Q.blade_lim_z3==='no'){
         h+=card('imm','🔴','Fan Blade GTF — Acción Correctiva Requerida',
-          'Fan blade fuera de límites de servicio.<br>Corregir conforme AMM antes del próximo vuelo.<br>Dependiendo del daño puede requerirse: Blend · Replacement · Balance · Inspecciones posteriores.',
+          'Fan blade fuera de límites de servicio.<br>Si el daño está dentro de límites reparables → efectuar reparación conforme AMM/EMM antes del próximo vuelo.<br>Si el daño excede límites reparables → remover el motor de servicio.',
           'ANTES DEL PRÓXIMO VUELO','','','');
       }
     } else if((gtfZ==='z2'||Q.area_a==='yes')&&Q.rotor!=='no'){
       // Zone 2: fan blade damage → BSI LPC deferred (only if rotor turns)
       h+=card('def','🟡','BSI LPC — Diferible · 1 motor · Zona 2 (GTF)',
-        'Evidencia en fan blades sin parámetros alterados.<br>Secuencia: LPC → si debris → HPC → HPT → LPT. <b>Si LPC limpio → STOP. HPC NO requerida.</b>',
+        'Evidencia en fan blades sin parámetros alterados.<br>Secuencia: LPC → si hay evidencia de restos de ave o daño nuevo → HPC → HPT → LPT. <b>Si LPC limpio → STOP. HPC NO requerida.</b>',
         '10 FH o 2 FC','TASK 72-31-00-290-802-A / -A-01','bsi-gtf','10 FH / 2 FC');
     } else if(gtfZ==='z1'&&organicEvidence&&noUVAvail){
       // UV not available + visible remains + Zone 1 → same as UV available: no BSI if no blade damage
