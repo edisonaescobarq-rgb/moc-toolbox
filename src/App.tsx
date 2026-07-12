@@ -444,6 +444,7 @@ function VibrationModule() {
   // selectedMap used for future deferral logic only
   const ranking = useMemo(() => topThree(vibrationTypes, totals), [totals]);
   const best = ranking[0];
+  const rudderInTop3 = ranking.find(r => r.id === 5);
   return (
     <div style={{ padding: "20px 24px", maxWidth: 1100, margin: "0 auto" }} className="fadeIn">
       <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
@@ -475,7 +476,7 @@ function VibrationModule() {
                     <span style={{ color: a.startsWith("⚠") ? "var(--red)" : "var(--accent)" }}>{a.startsWith("⚠") ? "⚠" : "→"}</span> {a.startsWith("⚠") ? a.slice(2) : a}
                   </div>
                 ))}
-                {best.id === 5 && best.total > 0 && (
+                {best.id === 5 && best.total >= 20 && (
                   <div style={{ marginTop: 12, background: "rgba(220,38,38,0.06)", border: "1.5px solid rgba(220,38,38,0.25)", borderRadius: 8, padding: 12 }}>
                     <div style={{ fontFamily: "var(--mono)", fontSize: 10, fontWeight: 700, color: "var(--red)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                       ⚠ AOT A55N004-25 — P/N Rudder afectados
@@ -488,6 +489,22 @@ function VibrationModule() {
                     </div>
                     <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--red)", marginTop: 8 }}>
                       Si coincide → Contactar PSE Engineering · AD 2026-0083
+                    </div>
+                  </div>
+                )}
+                {rudderInTop3 && rudderInTop3.total > 20 && best?.id !== 5 && (
+                  <div style={{ marginTop: 12, background: "rgba(220,38,38,0.06)", border: "1.5px solid rgba(220,38,38,0.35)", borderRadius: 8, padding: 12 }}>
+                    <div style={{ fontFamily: "var(--mono)", fontSize: 10, fontWeight: 700, color: "var(--red)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                      ⚠ Rudder en Top 3 con score &gt; 20 — TSM 05-50-00-810-801-A §3.B.(1).(d)
+                    </div>
+                    <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text2)", marginBottom: 4 }}>Verificar P/N en lista AOT A55N004-25</div>
+                    <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text2)", marginBottom: 4 }}>Si P/N listado → contactar PSE Engineering para activar:</div>
+                    {["AD-A320FAM-55-C4540-TEST","AD-A320FAM-55-C4540-LIMIT","AD-A320FAM-55-C4540-DFDR"].map(ad => (
+                      <div key={ad} style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--red)", paddingLeft: 12, marginBottom: 2 }}>· {ad}</div>
+                    ))}
+                    <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text2)", marginTop: 6, marginBottom: 4 }}>Enviar a Airbus vía TechRequest (cc Baseline Engineering): VRS + Decision Table + DFDR + acciones correctivas.</div>
+                    <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--red)", marginTop: 6, borderTop: "1px solid rgba(220,38,38,0.2)", paddingTop: 6 }}>
+                      NOTA: Fuente de vibración debe ser confirmada por Airbus antes de 200 FC desde el VRS.
                     </div>
                   </div>
                 )}
@@ -528,22 +545,54 @@ function VibrationModule() {
             {vStation && vHistory ? (() => {
               const isMain  = vStation === "main";
               const hasHist = vHistory === "yes";
+              const rudderIsTop1 = best?.id === 5 && (best?.total ?? 0) > 20;
+              const strongOrRumbling = selectedIds.includes("intensity_strong") || selectedIds.includes("perception_rumbling");
+              const rudderTop3Over20 = !rudderIsTop1 && rudderInTop3 && rudderInTop3.total > 20;
               let para, fc, color, steps, warning;
               if (isMain && !hasHist) {
-                para = "Párrafo 1 — Main Base / Sin histórico"; fc = "6 FC"; color = "var(--green)";
-                steps = ["Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias (Rudder, Aileron, Elevator)","Si sin defectos → diferir 6 FC bajo monitoreo","Tripulación completa VRS solo si hay vibración","Sin reportes en 6 FC → cerrar diferido"];
+                para = "Párrafo 1 — Main Base / Sin histórico";
+                if (rudderIsTop1) {
+                  fc = "Inmediata"; color = "var(--red)";
+                  steps = ["⚠ Rudder es fuente principal — seguir Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias (Rudder, Aileron, Elevator)","Si sin defectos → diferir 6 FC bajo monitoreo","Tripulación completa VRS solo si hay vibración","Sin reportes en 6 FC → cerrar diferido"];
+                } else {
+                  fc = "6 FC"; color = "var(--amber)";
+                  steps = ["Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias (Rudder, Aileron, Elevator)","Si sin defectos → diferir 6 FC bajo monitoreo","Tripulación completa VRS solo si hay vibración","Sin reportes en 6 FC → cerrar diferido"];
+                }
                 warning = "Si hay reportes → contactar Engineering PSE (LOCAL)";
               } else if (isMain && hasHist) {
-                para = "Párrafo 2 — Main Base / Con histórico"; fc = "6 FC"; color = "var(--amber)";
-                steps = ["Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Free Play Check a la fuente identificada (overnight)","Si Free Play dentro de límites → diferir 6 FC","Tripulación completa VRS en CADA vuelo (con o sin vibración)","Sin reportes en 6 FC → cerrar e informar a PSE y MOC"];
-                warning = "Si hay reportes → PSE LOCAL para extensión y/o próximas acciones";
+                para = "Párrafo 2 — Main Base / Con histórico";
+                if (strongOrRumbling) {
+                  fc = "Inmediata"; color = "var(--red)";
+                  steps = ["⚠ VRS indica Strong Vibration o Rumbling Noise","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","⚠ Contactar Engineering PSE (SCL) directamente antes de diferir — NO aplicar Free Play/diferido de 6 FC hasta indicación de PSE"];
+                  warning = "TSM 05-50-00-810-801-A — nota previa a Párrafo 2: Strong Vibration/Rumbling requiere contacto directo a PSE (SCL)";
+                } else if (rudderIsTop1) {
+                  fc = "Inmediata"; color = "var(--red)";
+                  steps = ["⚠ Rudder es fuente principal — seguir Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Free Play Check inmediato — NO diferir al overnight","Si Free Play dentro de límites → diferir 6 FC","Tripulación completa VRS en CADA vuelo (con o sin vibración)","Sin reportes en 6 FC → cerrar e informar a PSE y MOC"];
+                  warning = "Si hay reportes → PSE LOCAL para extensión y/o próximas acciones";
+                } else {
+                  fc = "Overnight"; color = "var(--amber)";
+                  steps = ["Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Free Play Check a la fuente identificada (overnight)","Si Free Play dentro de límites → diferir 6 FC","Tripulación completa VRS en CADA vuelo (con o sin vibración)","Sin reportes en 6 FC → cerrar e informar a PSE y MOC"];
+                  warning = rudderTop3Over20 ? "⚠ Rudder en Top 3 — ver alerta AOT A55N004-25 en Action Path" : "Si hay reportes → PSE LOCAL para extensión y/o próximas acciones";
+                }
               } else if (!isMain && !hasHist) {
-                para = "Párrafo 3 — Estación Remota / Sin histórico"; fc = "6 FC"; color = "var(--amber)";
-                steps = ["Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Damping Test (Aileron/Elevator) — Rudder: test operacional ambas direcciones","Si sin defectos → diferir 6 FC bajo monitoreo","Tripulación completa VRS solo si hay vibración"];
+                para = "Párrafo 3 — Estación Remota / Sin histórico";
+                if (rudderIsTop1) {
+                  fc = "2 FC"; color = "var(--red)";
+                  steps = ["⚠ Rudder es fuente principal — reubicar en Main Base urgente · ver Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Damping Test (Aileron/Elevator) — Rudder: test operacional ambas direcciones","Si sin defectos → diferir 2 FC para reubicar en Main Base","Tripulación completa VRS solo si hay vibración"];
+                } else {
+                  fc = "6 FC"; color = "var(--amber)";
+                  steps = ["Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Damping Test (Aileron/Elevator) — Rudder: test operacional ambas direcciones","Si sin defectos → diferir 6 FC bajo monitoreo","Tripulación completa VRS solo si hay vibración"];
+                }
                 warning = "Si hay reportes en 6 FC → contactar PSE LOCAL para extensión";
               } else {
-                para = "Párrafo 4 — Estación Remota / Con histórico"; fc = "2 FC"; color = "var(--red)";
-                steps = ["Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Damping Test (Aileron/Elevator) — Rudder: test operacional ambas direcciones","Si sin defectos → diferir 2 FC para reubicar en Main Base","Aplicar acciones correctivas en Main Base"];
+                para = "Párrafo 4 — Estación Remota / Con histórico"; fc = "2 FC";
+                if (rudderIsTop1) {
+                  color = "var(--red)";
+                  steps = ["⚠ Rudder es fuente principal — reubicar en Main Base urgente · ver Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Damping Test (Aileron/Elevator) — Rudder: test operacional ambas direcciones","Si sin defectos → diferir 2 FC para reubicar en Main Base","Aplicar acciones correctivas en Main Base"];
+                } else {
+                  color = "var(--amber)";
+                  steps = ["Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Damping Test (Aileron/Elevator) — Rudder: test operacional ambas direcciones","Si sin defectos → diferir 2 FC para reubicar en Main Base","Aplicar acciones correctivas en Main Base"];
+                }
                 warning = "Extensión de FC requiere evaluación Central Engineering PSE (SCL)";
               }
               return (
