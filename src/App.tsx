@@ -97,6 +97,12 @@ const vibrationRows = [
   { id: "ctrl_roll",        category: "Flight Controls (AP OFF)", parameter: "Roll stops vibration",   scores: [0,0,10,0,2,0,0,0,0,0,0,0,0,0,0,0] },
   { id: "ctrl_not_tried",   category: "Flight Controls (AP OFF)", parameter: "Not Tried",              scores: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
   { id: "ctrl_no_effect",   category: "Flight Controls (AP OFF)", parameter: "No Effect",              scores: [0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0] },
+  { id: "ecam_engine_warning",     category: "ECAM Indications", parameter: "Engine vibration warning (ECAM)",     scores: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ecam_aileron_oscillates", category: "ECAM Indications", parameter: "Aileron position oscillates (F/CTL)", scores: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ecam_ail_servo_fault",    category: "ECAM Indications", parameter: "AIL SERVO FAULT (ECAM warning)",      scores: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ecam_elevator_oscillates",category: "ECAM Indications", parameter: "Elevator position oscillates (F/CTL)",scores: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ecam_rudder_oscillates",  category: "ECAM Indications", parameter: "Rudder position oscillates (F/CTL)", scores: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
+  { id: "ecam_rumbling_cockpit",   category: "ECAM Indications", parameter: "Rumbling noise only in cockpit",      scores: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] },
 ];
 
 const vibrationTypes = [
@@ -114,8 +120,8 @@ const vibrationTypes = [
   { id: 12, label: "T12", short: "PAX Door", ref: "TASK 52-11-00-810-826-A" },
   { id: 13, label: "T13", short: "PAX Door (Aft)", ref: "TASK 52-13-00-810-826-A" },
   { id: 14, label: "T14", short: "N/A", ref: "Not applicable" },
-  { id: 15, label: "T15", short: "Rumbling Cockpit", ref: "Refer to TASK 21-26" },
-  { id: 16, label: "T16", short: "Rudder Pedals", ref: "Type 16 corrective action" },
+  { id: 15, label: "T15", short: "Rudder Oscillation", ref: "TASK 27-20-00-810-808-A" },
+  { id: 16, label: "T16", short: "Rudder Pedals", ref: "TASK 27-20-00-810-917-A" },
 ];
 
 // Part Numbers afectados por AOT A55N004-25 (AD 2026-0083)
@@ -135,8 +141,6 @@ const vibrationActions = {
     "Verificar P/N del Rudder en Maintenix contra lista AOT A55N004-25",
     "Si P/N está en lista AOT: activar AD-A320FAM-55-C4540-PART1, PART2 y AD 2026-0083",
     "Si P/N NO está en lista AOT: continuar con GVI a superficies de vuelo primarias",
-    "Si score Rudder >20 y no identificado por Decision Tree: activar AD-A320FAM-55-C4540-TEST/LIMIT/DFDR",
-    "Enviar a Airbus via TechRequest: VRS + Decision Table + DFDR + acciones correctivas",
     "⚠ AD 2026-0083: fuente de vibración debe ser confirmada por Airbus antes de 200 FC"
   ],
   6: ["Flap vibration path (TASK 27-54-00-810-801-A)", "Correlate with extended slat/flap configuration"],
@@ -146,7 +150,7 @@ const vibrationActions = {
   11: ["Mid-cabin belly fairing path (TASK 53-35-00-810-801-A)"],
   12: ["FWD PAX door vibration / noise path (TASK 52-11-00-810-826-A)"],
   13: ["AFT PAX door vibration / noise path (TASK 52-13-00-810-826-A)"],
-  15: ["Refer to TASK 21-26 for cockpit rumbling only"],
+  15: ["Rudder servocontrol oscillation path (TASK 27-20-00-810-808-A)"],
   16: ["Rudder pedal-only vibration path (TASK 27-20-00-810-917-A)"],
 };
 
@@ -445,6 +449,28 @@ function VibrationModule() {
   const ranking = useMemo(() => topThree(vibrationTypes, totals), [totals]);
   const best = ranking[0];
   const rudderInTop3 = ranking.find(r => r.id === 5);
+
+  const treePriorityOrder = [
+    { id: "ecam_engine_warning",     result: { kind: "engine" } },
+    { id: "ecam_aileron_oscillates", result: { kind: "type", type: 4 } },
+    { id: "ecam_ail_servo_fault",    result: { kind: "type", type: 4 } },
+    { id: "ctrl_roll",               result: { kind: "type", type: 3 } },
+    { id: "ecam_elevator_oscillates",result: { kind: "type", type: 2 } },
+    { id: "param_airbrakes",         result: { kind: "type", type: 1 } },
+    { id: "ctrl_pitch",              result: { kind: "type", type: 1 } },
+    { id: "ecam_rudder_oscillates",  result: { kind: "type", type: 15 } },
+    { id: "ctrl_yaw",                result: { kind: "type", type: 5 } },
+    { id: "ecam_rumbling_cockpit",   result: { kind: "task2126" } },
+  ];
+  const treeMatch = treePriorityOrder.find(p => selectedIds.includes(p.id));
+  const treeIdentifiedType = treeMatch?.result.kind === "type" ? treeMatch.result.type : null;
+  const identifiedSource = treeIdentifiedType
+    ? vibrationTypes.find(t => t.id === treeIdentifiedType)
+    : (!treeMatch && best && best.total >= 20 ? best : null);
+  const confirmedType5 = treeIdentifiedType === 5 || (!treeMatch && best?.id === 5 && (best?.total ?? 0) >= 20);
+  const showScoringTable = !treeMatch;
+  const treeTerminal = treeMatch && (treeMatch.result.kind === "engine" || treeMatch.result.kind === "task2126");
+
   return (
     <div style={{ padding: "20px 24px", maxWidth: 1100, margin: "0 auto" }} className="fadeIn">
       <div style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
@@ -462,21 +488,57 @@ function VibrationModule() {
           {Object.entries(rowsByCategory).map(([cat, rows]) => <CatPanel key={cat} category={cat} rows={rows} selectedIds={selectedIds} toggle={toggle} />)}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
-            <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Top Sources</div>
-            {ranking.map((item, i) => <RankCard key={item.id} item={item} rank={i} />)}
-          </div>
+          {showScoringTable ? (
+            <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Top Sources</div>
+              {ranking.map((item, i) => <RankCard key={item.id} item={item} rank={i} />)}
+            </div>
+          ) : (
+            <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Fuente identificada por Decision Tree</div>
+              {treeMatch.result.kind === "type" && identifiedSource && (
+                <div style={{ padding: 12, background: "rgba(220,38,38,0.06)", border: "1.5px solid var(--red)", borderRadius: 8 }}>
+                  <div style={{ fontFamily: "var(--mono)", fontSize: 13, fontWeight: 700, color: "var(--red)", marginBottom: 6 }}>{identifiedSource.short}</div>
+                  <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text2)" }}>{identifiedSource.ref}</div>
+                </div>
+              )}
+              {treeMatch.result.kind === "engine" && (
+                <div style={{ padding: 12, background: "rgba(220,38,38,0.06)", border: "1.5px solid var(--red)", borderRadius: 8, fontFamily: "var(--mono)", fontSize: 13, color: "var(--red)" }}>
+                  Hacer troubleshooting del ECAM warning de motor (fuente no es F/CTL)
+                </div>
+              )}
+              {treeMatch.result.kind === "task2126" && (
+                <div style={{ padding: 12, background: "rgba(220,38,38,0.06)", border: "1.5px solid var(--red)", borderRadius: 8, fontFamily: "var(--mono)", fontSize: 13, color: "var(--red)" }}>
+                  Refer to TASK 21-26
+                </div>
+              )}
+              <div style={{ marginTop: 10, padding: "8px 10px", background: "var(--surface2)", borderRadius: 6, fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", fontStyle: "italic" }}>
+                ℹ Decision Table: omitida — fuente ya identificada por Decision Tree (TSM §3.B.(1).(c))
+              </div>
+            </div>
+          )}
           <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
             <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Action Path · Rev 52 / Feb 2026</div>
-            {best && best.total > 0 ? (
+            {treeTerminal ? (
+              <div style={{ padding: 16, background: "rgba(29,78,216,0.06)", border: "1.5px solid var(--accent)", borderRadius: 8 }}>
+                <div style={{ fontFamily: "var(--mono)", fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 8 }}>
+                  ℹ Esta indicación deriva a troubleshooting fuera de este procedimiento (TSM 05-50-00-810-801-A)
+                </div>
+                <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text2)" }}>
+                  {treeMatch.result.kind === "engine"
+                    ? "ECAM Engine Page indica vibración excesiva → Hacer troubleshooting del ECAM warning de motor (fuera del alcance de este procedimiento — no es F/CTL)."
+                    : "Rumbling noise solo en cockpit → Refer to TASK 21-26 (fuera del alcance de este procedimiento)."}
+                </div>
+              </div>
+            ) : identifiedSource != null ? (
               <div>
-                <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--accent)", marginBottom: 10 }}>Primary: {best.short}</div>
-                {(vibrationActions[best.id] || []).map((a, i) => (
+                <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--accent)", marginBottom: 10 }}>Primary: {identifiedSource.short}</div>
+                {(vibrationActions[identifiedSource.id] || []).map((a, i) => (
                   <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, padding: "8px 10px", background: a.startsWith("⚠") ? "rgba(220,38,38,0.06)" : "var(--surface2)", borderRadius: 6, fontSize: 12, fontFamily: "var(--mono)", color: a.startsWith("⚠") ? "var(--red)" : "var(--text2)", borderLeft: a.startsWith("⚠") ? "3px solid var(--red)" : "3px solid var(--accent)" }}>
                     <span style={{ color: a.startsWith("⚠") ? "var(--red)" : "var(--accent)" }}>{a.startsWith("⚠") ? "⚠" : "→"}</span> {a.startsWith("⚠") ? a.slice(2) : a}
                   </div>
                 ))}
-                {best.id === 5 && best.total >= 20 && (
+                {confirmedType5 && (
                   <div style={{ marginTop: 12, background: "rgba(220,38,38,0.06)", border: "1.5px solid rgba(220,38,38,0.25)", borderRadius: 8, padding: 12 }}>
                     <div style={{ fontFamily: "var(--mono)", fontSize: 10, fontWeight: 700, color: "var(--red)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                       ⚠ AOT A55N004-25 — P/N Rudder afectados
@@ -492,7 +554,7 @@ function VibrationModule() {
                     </div>
                   </div>
                 )}
-                {rudderInTop3 && rudderInTop3.total > 20 && best?.id !== 5 && (
+                {rudderInTop3 && rudderInTop3.total > 20 && identifiedSource?.id !== 5 && (
                   <div style={{ marginTop: 12, background: "rgba(220,38,38,0.06)", border: "1.5px solid rgba(220,38,38,0.35)", borderRadius: 8, padding: 12 }}>
                     <div style={{ fontFamily: "var(--mono)", fontSize: 10, fontWeight: 700, color: "var(--red)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                       ⚠ Rudder en Top 3 con score &gt; 20 — TSM 05-50-00-810-801-A §3.B.(1).(d)
@@ -513,6 +575,8 @@ function VibrationModule() {
           </div>
           <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
             <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Deferral Guide · TSM 05-50-00-810-801-A Rev52</div>
+            {!treeTerminal ? (
+            <>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
               <div>
                 <div style={{ fontFamily: "var(--mono)", fontSize: 9, color: "var(--text3)", marginBottom: 6, textTransform: "uppercase" }}>Ubicación A/C</div>
@@ -551,7 +615,7 @@ function VibrationModule() {
               let para, fc, color, steps, warning;
               if (isMain && !hasHist) {
                 para = "Párrafo 1 — Main Base / Sin histórico";
-                if (rudderIsTop1) {
+                if (confirmedType5) {
                   fc = "Inmediata"; color = "var(--red)";
                   steps = ["⚠ Rudder es fuente principal — seguir Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias (Rudder, Aileron, Elevator)","Si sin defectos → diferir 6 FC bajo monitoreo","Tripulación completa VRS solo si hay vibración","Sin reportes en 6 FC → cerrar diferido"];
                 } else {
@@ -565,7 +629,7 @@ function VibrationModule() {
                   fc = "Inmediata"; color = "var(--red)";
                   steps = ["⚠ VRS indica Strong Vibration o Rumbling Noise","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","⚠ Contactar Engineering PSE (SCL) directamente antes de diferir — NO aplicar Free Play/diferido de 6 FC hasta indicación de PSE"];
                   warning = "TSM 05-50-00-810-801-A — nota previa a Párrafo 2: Strong Vibration/Rumbling requiere contacto directo a PSE (SCL)";
-                } else if (rudderIsTop1) {
+                } else if (confirmedType5) {
                   fc = "Inmediata"; color = "var(--red)";
                   steps = ["⚠ Rudder es fuente principal — seguir Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Free Play Check inmediato — NO diferir al overnight","Si Free Play dentro de límites → diferir 6 FC","Tripulación completa VRS en CADA vuelo (con o sin vibración)","Sin reportes en 6 FC → cerrar e informar a PSE y MOC"];
                   warning = "Si hay reportes → PSE LOCAL para extensión y/o próximas acciones";
@@ -576,7 +640,7 @@ function VibrationModule() {
                 }
               } else if (!isMain && !hasHist) {
                 para = "Párrafo 3 — Estación Remota / Sin histórico";
-                if (rudderIsTop1) {
+                if (confirmedType5) {
                   fc = "2 FC"; color = "var(--red)";
                   steps = ["⚠ Rudder es fuente principal — reubicar en Main Base urgente · ver Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Damping Test (Aileron/Elevator) — Rudder: test operacional ambas direcciones","Si sin defectos → diferir 2 FC para reubicar en Main Base","Tripulación completa VRS solo si hay vibración"];
                 } else {
@@ -586,7 +650,7 @@ function VibrationModule() {
                 warning = "Si hay reportes en 6 FC → contactar PSE LOCAL para extensión";
               } else {
                 para = "Párrafo 4 — Estación Remota / Con histórico"; fc = "2 FC";
-                if (rudderIsTop1) {
+                if (confirmedType5) {
                   color = "var(--red)";
                   steps = ["⚠ Rudder es fuente principal — reubicar en Main Base urgente · ver Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Damping Test (Aileron/Elevator) — Rudder: test operacional ambas direcciones","Si sin defectos → diferir 2 FC para reubicar en Main Base","Aplicar acciones correctivas en Main Base"];
                 } else {
@@ -614,6 +678,12 @@ function VibrationModule() {
             })() : (
               <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)", textAlign: "center", padding: 12 }}>
                 Selecciona ubicación e histórico para ver el deferral aplicable
+              </div>
+            )}
+            </>
+            ) : (
+              <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--text3)", textAlign: "center", padding: 16 }}>
+                Decision Tree derivó a otro procedimiento — el Deferral Guide de vibración de estructura (TSM 05-50-00-810-801-A §3.B) no aplica a este caso. Ver Action Path arriba para el paso a seguir.
               </div>
             )}
           </div>
