@@ -590,7 +590,23 @@ function VibrationModule() {
                   </div>
                 )}
               </div>
-            ) : <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)", textAlign: "center", padding: 20 }}>Select conditions to generate action path</div>}
+            ) : selectedIds.length > 0 ? (
+              <div style={{ padding: 16, background: "var(--surface2)", borderRadius: 8, fontFamily: "var(--mono)", fontSize: 11, color: "var(--text2)" }}>
+                <div style={{ fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Ningún candidato alcanza el umbral de significancia del TSM (score ≥ 20, pág. 10)</div>
+                {ranking.filter(r => r.total > 0).length > 0 && (
+                  <div style={{ marginBottom: 8 }}>
+                    {ranking.filter(r => r.total > 0).map(r => (
+                      <div key={r.id} style={{ color: "var(--text3)" }}>· {r.short} ({r.total}) — no significativo según TSM</div>
+                    ))}
+                  </div>
+                )}
+                <div style={{ color: "var(--text3)", fontStyle: "italic" }}>
+                  Esto puede indicar datos insuficientes en el VRS, o vibración no atribuible a una fuente estructural única. Considera repetir el análisis con datos adicionales, o proceder según juicio de Engineering PSE.
+                </div>
+              </div>
+            ) : (
+              <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)", textAlign: "center", padding: 20 }}>Select conditions to generate action path</div>
+            )}
           </div>
           <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
             <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Deferral Guide · TSM 05-50-00-810-801-A Rev52</div>
