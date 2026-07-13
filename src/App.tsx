@@ -355,6 +355,25 @@ function CatPanel({ category, rows, selectedIds, toggle }) {
   );
 }
 
+function CollapsibleCatPanel({ category, rows, selectedIds, toggle }) {
+  const checkedCount = rows.filter(row => selectedIds.includes(row.id)).length;
+  const [expanded, setExpanded] = useState(checkedCount > 0);
+  return (
+    <div style={{ background: "var(--surface2)", border: "1.5px solid var(--border)", borderRadius: 8, padding: 10, marginBottom: 8 }}>
+      <div
+        onClick={() => setExpanded(e => !e)}
+        style={{ fontSize: 9, fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: expanded ? 6 : 0, fontFamily: "var(--mono)", cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+      >
+        <span>{expanded ? "▾" : "▸"} {category}</span>
+        {checkedCount > 0 && (
+          <span style={{ color: "var(--accent)", fontWeight: 700 }}>● {checkedCount}</span>
+        )}
+      </div>
+      {expanded && rows.map(row => <CheckItem key={row.id} row={row} checked={selectedIds.includes(row.id)} onToggle={() => toggle(row)} />)}
+    </div>
+  );
+}
+
 function RankCard({ item, rank }) {
   const rankColors = ["#d97706", "#94a3b8", "#cd7f32"];
   const rankLabels = ["01", "02", "03"];
@@ -485,7 +504,7 @@ function VibrationModule() {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 20 }}>
         <div style={{ maxHeight: "75vh", overflowY: "auto", paddingRight: 4 }}>
-          {Object.entries(rowsByCategory).map(([cat, rows]) => <CatPanel key={cat} category={cat} rows={rows} selectedIds={selectedIds} toggle={toggle} />)}
+          {Object.entries(rowsByCategory).map(([cat, rows]) => <CollapsibleCatPanel key={cat} category={cat} rows={rows} selectedIds={selectedIds} toggle={toggle} />)}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {showScoringTable ? (
