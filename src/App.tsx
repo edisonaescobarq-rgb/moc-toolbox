@@ -539,6 +539,17 @@ function VibrationModule() {
               </div>
             </div>
           )}
+          {treeMatch && (
+            <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)", opacity: 0.7 }}>
+              <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 8, textTransform: "uppercase" }}>Decision Table (referencia, no usada en esta decisión)</div>
+              {ranking.map((item, i) => (
+                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)", padding: "4px 0" }}>
+                  <span>{item.short} ({item.label})</span>
+                  <span>{item.total}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
             <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Action Path · Rev 52 / Feb 2026</div>
             {treeTerminal ? (
