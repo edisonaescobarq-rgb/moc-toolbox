@@ -513,7 +513,11 @@ function VibrationModule() {
           {showScoringTable ? (
             <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
               <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Top Sources</div>
-              {ranking.map((item, i) => <RankCard key={item.id} item={item} rank={i} />)}
+              {best && best.total > 0 ? (
+                ranking.map((item, i) => <RankCard key={item.id} item={item} rank={i} />)
+              ) : (
+                <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text3)", textAlign: "center", padding: 20 }}>Selecciona condiciones para ver el ranking</div>
+              )}
             </div>
           ) : (
             <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
@@ -535,7 +539,7 @@ function VibrationModule() {
                 </div>
               )}
               <div style={{ marginTop: 10, padding: "8px 10px", background: "var(--surface2)", borderRadius: 6, fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", fontStyle: "italic" }}>
-                ℹ Decision Table: omitida — fuente ya identificada por Decision Tree (TSM §3.B.(1).(c))
+                ℹ Decision Table: no requerida — fuente ya identificada por Decision Tree (TSM §3.B.(1).(c))
               </div>
             </div>
           )}
@@ -551,7 +555,7 @@ function VibrationModule() {
             </div>
           )}
           <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
-            <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Action Path · Rev 52 / Feb 2026</div>
+            <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Action Path · Rev 53 / May 2026</div>
             {treeTerminal ? (
               <div style={{ padding: 16, background: "rgba(29,78,216,0.06)", border: "1.5px solid var(--accent)", borderRadius: 8 }}>
                 <div style={{ fontFamily: "var(--mono)", fontSize: 12, fontWeight: 700, color: "var(--accent)", marginBottom: 8 }}>
@@ -565,7 +569,7 @@ function VibrationModule() {
               </div>
             ) : identifiedSource != null ? (
               <div>
-                <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--accent)", marginBottom: 10 }}>Primary: {identifiedSource.short}</div>
+                <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--accent)", marginBottom: 10 }}>Primary: {identifiedSource.short} ({identifiedSource.label})</div>
                 {(vibrationActions[identifiedSource.id] || []).map((a, i) => (
                   <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, padding: "8px 10px", background: a.startsWith("⚠") ? "rgba(220,38,38,0.06)" : "var(--surface2)", borderRadius: 6, fontSize: 12, fontFamily: "var(--mono)", color: a.startsWith("⚠") ? "var(--red)" : "var(--text2)", borderLeft: a.startsWith("⚠") ? "3px solid var(--red)" : "3px solid var(--accent)" }}>
                     <span style={{ color: a.startsWith("⚠") ? "var(--red)" : "var(--accent)" }}>{a.startsWith("⚠") ? "⚠" : "→"}</span> {a.startsWith("⚠") ? a.slice(2) : a}
@@ -623,7 +627,7 @@ function VibrationModule() {
             )}
           </div>
           <div style={{ background: "var(--surface)", border: "1.5px solid var(--border)", borderRadius: 10, padding: 16, boxShadow: "var(--shadow-sm)" }}>
-            <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Deferral Guide · TSM 05-50-00-810-801-A Rev52</div>
+            <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", letterSpacing: "0.1em", marginBottom: 12, textTransform: "uppercase" }}>Deferral Guide · TSM 05-50-00-810-801-A Rev53</div>
             {!treeTerminal ? (
             <>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
