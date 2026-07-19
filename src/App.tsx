@@ -468,6 +468,9 @@ function VibrationModule() {
   const ranking = useMemo(() => topThree(vibrationTypes, totals), [totals]);
   const best = ranking[0];
   const rudderInTop3 = ranking.find(r => r.id === 5);
+  const isMain = vStation === "main";
+  const hasHist = vHistory === "yes";
+  const parrafoNum = isMain && !hasHist ? "1" : (!isMain && !hasHist ? "3" : "4");
 
   const treePriorityOrder = [
     { id: "ecam_engine_warning",     result: { kind: "engine" } },
@@ -636,14 +639,26 @@ function VibrationModule() {
               <div style={{ marginBottom: 12, padding: "10px 14px", background: "rgba(220,38,38,0.07)", border: "1.5px solid var(--red)", borderRadius: 8, display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <span style={{ color: "var(--red)", fontSize: 16, flexShrink: 0 }}>⚠</span>
                 <div>
-                  <div style={{ fontFamily: "var(--mono)", fontSize: 11, fontWeight: 700, color: "var(--red)", marginBottom: 3 }}>Strong Vibration / Rumbling — Acción inmediata</div>
-                  <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text2)" }}>El VRS indica <b>Strong Vibration</b> o <b>Rumbling Noise</b> → Contactar <b>Engineering PSE (SCL)</b> directamente antes de diferir.</div>
+                  {isMain && hasHist ? (
+                    <>
+                      <div style={{ fontFamily: "var(--mono)", fontSize: 11, fontWeight: 700, color: "var(--red)", marginBottom: 3 }}>Strong Vibration / Rumbling — Acción inmediata</div>
+                      <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text2)" }}>El VRS indica <b>Strong Vibration</b> o <b>Rumbling Noise</b> → Contactar <b>Engineering PSE (SCL)</b> directamente antes de diferir.</div>
+                    </>
+                  ) : vStation && vHistory ? (
+                    <>
+                      <div style={{ fontFamily: "var(--mono)", fontSize: 11, fontWeight: 700, color: "var(--red)", marginBottom: 3 }}>Strong Vibration / Rumbling — Informativo</div>
+                      <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text2)" }}>VRS indica <b>Strong Vibration</b> o <b>Rumbling Noise</b>. TSM 05-50-00-810-801-A menciona contacto obligatorio a PSE (SCL) "antes de diferir" específicamente para Main Base/Con histórico (Párrafo 2) — no aplica a esta configuración. Ver Deferral Guide abajo para el procedimiento correspondiente a Párrafo {parrafoNum}.</div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ fontFamily: "var(--mono)", fontSize: 11, fontWeight: 700, color: "var(--red)", marginBottom: 3 }}>Strong Vibration / Rumbling</div>
+                      <div style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--text2)" }}>VRS indica <b>Strong Vibration</b> o <b>Rumbling Noise</b>. Selecciona Ubicación e Histórico abajo — el TSM define un contacto obligatorio a PSE (SCL) "antes de diferir" específicamente para Main Base/Con histórico (Párrafo 2).</div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
             {vStation && vHistory ? (() => {
-              const isMain  = vStation === "main";
-              const hasHist = vHistory === "yes";
               const rudderIsTop1 = best?.id === 5 && (best?.total ?? 0) > 20;
               const strongOrRumbling = selectedIds.includes("intensity_strong") || selectedIds.includes("perception_rumbling");
               const rudderTop3Over20 = !rudderIsTop1 && rudderInTop3 && rudderInTop3.total > 20;
