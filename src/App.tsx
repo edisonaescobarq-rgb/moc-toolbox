@@ -647,11 +647,11 @@ function VibrationModule() {
               const rudderIsTop1 = best?.id === 5 && (best?.total ?? 0) > 20;
               const strongOrRumbling = selectedIds.includes("intensity_strong") || selectedIds.includes("perception_rumbling");
               const rudderTop3Over20 = !rudderIsTop1 && rudderInTop3 && rudderInTop3.total > 20;
-              let para, fc, color, steps, warning;
+              let para, fc, fcOutcome, color, steps, warning;
               if (isMain && !hasHist) {
                 para = "Párrafo 1 — Main Base / Sin histórico";
                 if (confirmedType5) {
-                  fc = "Inmediata"; color = "var(--red)";
+                  fc = "Verificar ahora"; fcOutcome = "6 FC si sin defectos"; color = "var(--red)";
                   steps = ["⚠ Rudder es fuente principal — seguir Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias (Rudder, Aileron, Elevator)","Si sin defectos → diferir 6 FC bajo monitoreo","Tripulación completa VRS solo si hay vibración","Sin reportes en 6 FC → cerrar diferido"];
                 } else {
                   fc = "6 FC"; color = "var(--amber)";
@@ -665,7 +665,7 @@ function VibrationModule() {
                   steps = ["⚠ VRS indica Strong Vibration o Rumbling Noise","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","⚠ Contactar Engineering PSE (SCL) directamente antes de diferir — NO aplicar Free Play/diferido de 6 FC hasta indicación de PSE"];
                   warning = "TSM 05-50-00-810-801-A — nota previa a Párrafo 2: Strong Vibration/Rumbling requiere contacto directo a PSE (SCL)";
                 } else if (confirmedType5) {
-                  fc = "Inmediata"; color = "var(--red)";
+                  fc = "Free Play ahora"; fcOutcome = "6 FC si dentro de límites"; color = "var(--red)";
                   steps = ["⚠ Rudder es fuente principal — seguir Action Path AOT A55N004-25","Revisar PFR — defectos en F/CTL","Verificar VRS con Decision Tree (antes de 20 FC)","GVI a superficies primarias","Free Play Check inmediato — NO diferir al overnight","Si Free Play dentro de límites → diferir 6 FC","Tripulación completa VRS en CADA vuelo (con o sin vibración)","Sin reportes en 6 FC → cerrar e informar a PSE y MOC"];
                   warning = "Si hay reportes → PSE LOCAL para extensión y/o próximas acciones";
                 } else {
@@ -698,7 +698,15 @@ function VibrationModule() {
                 <div style={{ background: "var(--surface2)", border: `2px solid ${color}`, borderRadius: 10, padding: 14 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <div style={{ fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)" }}>{para}</div>
-                    <div style={{ fontFamily: "var(--sans)", fontWeight: 800, fontSize: 20, color }}>⏱ {fc}</div>
+                    {fcOutcome ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ fontFamily: "var(--sans)", fontWeight: 800, fontSize: 20, color }}>⏱ {fc}</div>
+                        <span style={{ fontFamily: "var(--mono)", fontSize: 13, color: "var(--text3)" }}>→</span>
+                        <div style={{ fontFamily: "var(--sans)", fontWeight: 700, fontSize: 16, color: "var(--amber)" }}>{fcOutcome}</div>
+                      </div>
+                    ) : (
+                      <div style={{ fontFamily: "var(--sans)", fontWeight: 800, fontSize: 20, color }}>⏱ {fc}</div>
+                    )}
                   </div>
                   {steps.map((s, i) => (
                     <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, fontFamily: "var(--mono)", fontSize: 11, color: "var(--text2)" }}>
