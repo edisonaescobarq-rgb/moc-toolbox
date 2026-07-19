@@ -473,16 +473,16 @@ function VibrationModule() {
   const parrafoNum = isMain && !hasHist ? "1" : (!isMain && !hasHist ? "3" : "4");
 
   const treePriorityOrder = [
-    { id: "ecam_engine_warning",     result: { kind: "engine" } },
-    { id: "ecam_aileron_oscillates", result: { kind: "type", type: 4 } },
-    { id: "ecam_ail_servo_fault",    result: { kind: "type", type: 4 } },
-    { id: "ctrl_roll",               result: { kind: "type", type: 3 } },
-    { id: "ecam_elevator_oscillates",result: { kind: "type", type: 2 } },
-    { id: "param_airbrakes",         result: { kind: "type", type: 1 } },
-    { id: "ctrl_pitch",              result: { kind: "type", type: 1 } },
-    { id: "ecam_rudder_oscillates",  result: { kind: "type", type: 15 } },
-    { id: "ctrl_yaw",                result: { kind: "type", type: 5 } },
-    { id: "ecam_rumbling_cockpit",   result: { kind: "task2126" } },
+    { id: "ecam_engine_warning",     result: { kind: "engine" }, reason: 'Se marcó "Engine vibration warning (ECAM)" — el TSM indica que si el ECAM Engine Page muestra vibración excesiva, la causa no es de superficies de vuelo; se deriva a troubleshooting de motor.' },
+    { id: "ecam_aileron_oscillates", result: { kind: "type", type: 4 }, reason: 'Se marcó "Aileron position oscillates (F/CTL)" — el TSM indica que si la indicación de posición del Aileron oscila en ECAM F/CTL, la causa es Type 4 (oscilación de servocontrol del Aileron).' },
+    { id: "ecam_ail_servo_fault",    result: { kind: "type", type: 4 }, reason: 'Se marcó "AIL SERVO FAULT (ECAM warning)" — el TSM indica que este warning específico de ECAM confirma directamente Type 4 (oscilación de servocontrol del Aileron).' },
+    { id: "ctrl_roll",               result: { kind: "type", type: 3 }, reason: 'Se marcó "Roll stops vibration" — el TSM indica que si los inputs de roll detienen la vibración, la causa es Type 3 (juego excesivo en el borde de salida del Aileron).' },
+    { id: "ecam_elevator_oscillates",result: { kind: "type", type: 2 }, reason: 'Se marcó "Elevator position oscillates (F/CTL)" — el TSM indica que si la indicación de posición del Elevator oscila en ECAM F/CTL, la causa es Type 2 (oscilación de servocontrol del Elevator).' },
+    { id: "param_airbrakes",         result: { kind: "type", type: 1 }, reason: 'Se marcó "Airbrakes Ext." — el TSM indica que si la vibración empieza o para con inputs de airbrakes, la causa es Type 1 (juego excesivo en el borde de salida del Elevator), sin necesidad de evaluar más síntomas.' },
+    { id: "ctrl_pitch",              result: { kind: "type", type: 1 }, reason: 'Se marcó "Pitch stops vibration" — el TSM indica que si los inputs de pitch detienen la vibración, la causa es Type 1 (juego excesivo en el borde de salida del Elevator).' },
+    { id: "ecam_rudder_oscillates",  result: { kind: "type", type: 15 }, reason: 'Se marcó "Rudder position oscillates (F/CTL)" — el TSM indica que si la indicación de posición del Rudder oscila en ECAM F/CTL, la causa es Type 15 (oscilación de servocontrol del Rudder) — distinto de un problema de juego en el borde de salida (Type 5).' },
+    { id: "ctrl_yaw",                result: { kind: "type", type: 5 }, reason: 'Se marcó "Yaw stops vibration" (rudder/rudder trim) — el TSM indica que si estos inputs detienen la vibración, la causa es Type 5 (juego excesivo en el borde de salida del Rudder), lo que activa la verificación de P/N contra AOT A55N004-25.' },
+    { id: "ecam_rumbling_cockpit",   result: { kind: "task2126" }, reason: 'Se marcó "Rumbling noise only in cockpit" — el TSM deriva este caso a TASK 21-26, fuera del alcance de este procedimiento de vibraciones estructurales.' },
   ];
   const treeMatch = treePriorityOrder.find(p => selectedIds.includes(p.id));
   const treeIdentifiedType = treeMatch?.result.kind === "type" ? treeMatch.result.type : null;
@@ -541,6 +541,11 @@ function VibrationModule() {
               <div style={{ marginTop: 10, padding: "8px 10px", background: "var(--surface2)", borderRadius: 6, fontFamily: "var(--mono)", fontSize: 10, color: "var(--text3)", fontStyle: "italic" }}>
                 ℹ Decision Table: no requerida — fuente ya identificada por Decision Tree (TSM §3.B.(1).(c))
               </div>
+              {treeMatch.reason && (
+                <div style={{ marginTop: 8, padding: "8px 10px", background: "rgba(29,78,216,0.06)", border: "1px solid rgba(29,78,216,0.2)", borderRadius: 6, fontFamily: "var(--mono)", fontSize: 11, color: "var(--text2)" }}>
+                  <b style={{ color: "var(--accent)" }}>💡 Por qué:</b> {treeMatch.reason}
+                </div>
+              )}
             </div>
           )}
           {treeMatch && (
