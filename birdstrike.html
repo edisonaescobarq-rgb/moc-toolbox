@@ -532,7 +532,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
     <div class="sl">Hallazgos de la Inspección Visual</div>
     <div class="qr">
       <div class="qt">¿Daño en <b>fan blades</b>? (material faltante, daño más allá de límites de servicio)</div>
-      <div class="yw"><button class="yb yes" onclick="pick('cfm_blade_dmg','yes',this)">SÍ</button><button class="yb no" onclick="pick('cfm_blade_dmg','no',this)">NO</button></div>
+      <div class="yw"><button class="yb yes" onclick="pick('cfm_blade_dmg','yes',this)">SÍ</button><button class="yb no" onclick="pick('cfm_blade_dmg','no',this)">NO</button><button class="yb opt" onclick="pick('cfm_blade_dmg','pending',this)">PENDIENTE</button></div>
     </div>
     <div class="qr" id="cfm-broken-blade-q">
       <div class="qt">💥 ¿Fan blade <b>broken o missing</b> — fragmentos fuera del motor?
@@ -546,7 +546,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
 
     <div class="qr">
       <div class="qt">¿Evidencia de debris en <b>booster inlet</b>? (daño en spinner, stage 1 booster vane o splitter fairing)</div>
-      <div class="yw"><button class="yb yes" onclick="pick('cfm_booster_dmg','yes',this)">SÍ — Hay evidencia</button><button class="yb no" onclick="pick('cfm_booster_dmg','no',this)">NO — Sin evidencia</button></div>
+      <div class="yw"><button class="yb yes" onclick="pick('cfm_booster_dmg','yes',this)">SÍ — Hay evidencia</button><button class="yb no" onclick="pick('cfm_booster_dmg','no',this)">NO — Sin evidencia</button><button class="yb opt" onclick="pick('cfm_booster_dmg','pending',this)">PENDIENTE</button></div>
+    </div>
+    <div class="qr">
+      <div class="qt">¿FOD golpeó fan blades <b>radialmente hacia adentro del mid-span shroud</b>?
+        <div class="qref">AMM 72-00-00-200-006-A §4.C.1.a. Rub de blade tip en acoustic panels, sin missing material y sin evidencia en booster, no constituye esta condición.</div>
+      </div>
+      <div class="yw"><button class="yb yes" onclick="pick('cfm_midspan_dmg','yes',this)">SÍ</button><button class="yb no" onclick="pick('cfm_midspan_dmg','no',this)">NO</button><button class="yb opt" onclick="pick('cfm_midspan_dmg','pending',this)">PENDIENTE</button></div>
     </div>
     <div class="qr">
       <div class="qt">¿ECAM "FAN VIB ≥ 6 UNITS"?</div>
@@ -557,18 +563,15 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
       <div class="yw"><button class="yb yes" onclick="pick('cfm_rotor','yes',this)">SÍ — Libre</button><button class="yb no" onclick="pick('cfm_rotor','no',this)">NO — No gira / ruidos</button></div>
     </div>
 
-    <div class="sl">Zona de evidencia — Define alcance del BSI</div>
+    <div class="sl">Motor — Service Bulletin</div>
     <div class="qr">
-      <div class="qt"><b>¿Hasta dónde llegó la evidencia?</b> Selecciona la zona más profunda
-        <div class="qref">Define qué BSI se requiere y si puede diferirse.</div>
+      <div class="qt"><b>¿Motor es PRE CFM SB 72-0418?</b>
+        <div class="qref">Determina si aplica BSI adicional de booster stage 5 en FOD con parámetros normales (AMM §4.C.1) y el detalle de inspección de stage 5 dentro del booster completo en parámetros anormales (AMM §4.C.2).</div>
       </div>
-      <div id="cfm-zone-warn" style="display:none;margin:6px 0;padding:7px 12px;background:#3d1500;border-left:4px solid #ff6d00;border-radius:0 6px 6px 0;font-size:0.74rem;color:#ffab40">
-        ⚠ <b>Atención:</b> Marcaste evidencia en booster inlet — eso corresponde a <b>Zona 2</b> como mínimo. Verifica la selección.
-      </div>
-      <div class="yw" style="flex-wrap:wrap;gap:6px">
-        <button class="zb opt" onclick="pickZ('cfm_zone','z1',this)">🟢 <b>Zona 1 — Fan blades sin daño significativo</b><small>Inlet cowl / leading edge blades. Sin missing material. Sin evidencia en booster.<br>⚠ Daño en acoustic panels por rub de blade tip → Zona 1 si blade sin missing material y sin evidencia en booster. Si blade impactó liner con distorsión significativa de blade → evaluar Zona 2.</small></button>
-        <button class="zb opt" onclick="pickZ('cfm_zone','z2',this)">🟡 <b>Zona 2 — Fan blades con daño o booster inlet</b><small>Missing material en fan blades, daño inward del mid-span shroud, o restos en spinner/booster vane/splitter fairing.</small></button>
-        <button class="zb opt" onclick="pickZ('cfm_zone','z3',this)">🔴 <b>Zona 3 — Parámetros anormales / surge / stall</b><small>FOD con surge, stall, flameout, mismatch N2/WF/EGT, FAN VIB ≥6. BSI inmediata + Power Assurance Check.</small></button>
+      <div class="yw">
+        <button class="yb yes" onclick="pick('cfm_pre_sb','yes',this)">SÍ — Pre-SB</button>
+        <button class="yb no" onclick="pick('cfm_pre_sb','no',this)">NO — Post-SB</button>
+        <button class="yb opt" onclick="pick('cfm_pre_sb','unknown',this)">NO SÉ</button>
       </div>
     </div>
 
@@ -630,7 +633,7 @@ function pick(id,val,btn){
     document.getElementById('sec-cfm').style.display=val==='cfm'?'block':'none';
     if(val==='v25'){
       // Clear all GTF-specific variables
-      ['uv_available','uv_found','visual_found','gtf_zone','area_a','blade_lim','blade_lim_z3','blade_broken','probe_ok','gtf_fav','rotor','aohx','cfm_blade_dmg','cfm_booster_dmg','cfm_blade_broken','cfm_vib_ecam','cfm_rotor','cfm_zone','v25_blade_replaced'].forEach(k=>delete Q[k]);
+      ['uv_available','uv_found','visual_found','gtf_zone','area_a','blade_lim','blade_lim_z3','blade_broken','probe_ok','gtf_fav','rotor','aohx','cfm_blade_dmg','cfm_booster_dmg','cfm_blade_broken','cfm_vib_ecam','cfm_rotor','cfm_midspan_dmg','cfm_pre_sb','v25_blade_replaced'].forEach(k=>delete Q[k]);
       const uvResEl=document.getElementById('uv-result-q'); if(uvResEl) uvResEl.style.display='none';
       const uvNoEl=document.getElementById('uv-noavail-q'); if(uvNoEl) uvNoEl.style.display='none';
       // Reset GTF UI
@@ -647,7 +650,7 @@ function pick(id,val,btn){
     }
     if(val==='gtf'){
       // Clear all V2500-specific variables
-      ['v25_zone','v25_zq1','v25_zq2','v25_zq3','v25_zq4','v25_blade_dmg','v25_fav','v25_rotor','v25_bl_available','v25_bl_found','bleed_metal','cfm_blade_dmg','cfm_booster_dmg','cfm_vib_ecam','cfm_rotor','cfm_zone'].forEach(k=>delete Q[k]);
+      ['v25_zone','v25_zq1','v25_zq2','v25_zq3','v25_zq4','v25_blade_dmg','v25_fav','v25_rotor','v25_bl_available','v25_bl_found','bleed_metal','cfm_blade_dmg','cfm_booster_dmg','cfm_vib_ecam','cfm_rotor','cfm_midspan_dmg','cfm_pre_sb'].forEach(k=>delete Q[k]);
       const v25blEl=document.getElementById('v25-bl-result-q'); if(v25blEl) v25blEl.style.display='none';
       // Reset V2500 UI
       const fav=document.getElementById('v25-fav-q'); if(fav) fav.style.display='none';
@@ -802,7 +805,7 @@ function classify(){
     Q.blade_lim==='no'||Q.v25_blade_broken==='yes'||Q.rotor==='no'||Q.v25_rotor==='no'||Q.struct_dmg==='yes'||
     Q.leaks==='yes'||is2||Q.bleed_metal==='yes'||
     Q.cfm_blade_dmg==='yes'||Q.cfm_blade_broken==='yes'||Q.cfm_booster_dmg==='yes'||
-    Q.gtf_zone==='z4'||Q.v25_zone==='z4'||Q.v25_zone==='z2b'||Q.cfm_zone==='z3'||Q.cfm_rotor==='no'||Q.cfm_vib_ecam==='yes'||
+    Q.gtf_zone==='z4'||Q.v25_zone==='z4'||Q.v25_zone==='z2b'||Q.cfm_midspan_dmg==='yes'||Q.cfm_rotor==='no'||Q.cfm_vib_ecam==='yes'||
     Q.blade_lim==='no'||Q.blade_lim_z3==='no';
   const moderate=!major&&(Q.organic==='yes'||Q.v25_blade_dmg==='yes'||Q.uv_found==='yes'||
     Q.area_a==='yes'||Q.probe_dmg==='yes'||Q.visual_found==='yes'||
@@ -890,12 +893,6 @@ function render(){
     motorSymsEl  && motorSymsEl.classList.remove('dimmed');
     dimLbl.style.display='none';
   }
-  const cfmWarn = document.getElementById('cfm-zone-warn');
-  if(cfmWarn){
-    const boosterOrBlade = Q.cfm_booster_dmg==='yes' || Q.cfm_blade_dmg==='yes';
-    cfmWarn.style.display = (boosterOrBlade && Q.cfm_zone==='z1') ? 'block' : 'none';
-  }
-
   // GTF zone contradiction: restos visibles pero Zona 1
   const gtfWarn = document.getElementById('gtf-zone-warn');
   if(gtfWarn){
@@ -930,7 +927,7 @@ function renderActions(level){
   const crit=['surge','stall','flame','vibration','rumble','egtrise','parfluct','bang'];
   const hasCrit=crit.some(s=>SYMS.has(s));
   const critPhase=Q.phase==='approach'||Q.phase==='landing'||Q.phase==='takeoff';
-  const gtfZ=Q.gtf_zone||null, v25Z=Q.v25_zone||null, cfmZ=Q.cfm_zone||null;
+  const gtfZ=Q.gtf_zone||null, v25Z=Q.v25_zone||null;
   const gtfImm=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||Q.blade_lim==='no'||Q.blade_lim_z3==='no'||is2||gtfZ==='z4';
   const v25Imm=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||is2||v25Z==='z4';
   const v25BladeNotReplaced=isV25&&v25Z==='z2b'&&Q.v25_blade_replaced==='no';
@@ -1137,31 +1134,75 @@ function renderActions(level){
     }
   }
   if(isCFM){
-    const cfmAbnormal=hasCrit||Q.smell==='yes'||Q.ecam==='yes'||is2||cfmZ==='z3'||Q.cfm_vib_ecam==='yes';
-    const cfmNormal=!cfmAbnormal&&(cfmZ==='z2'||Q.cfm_blade_dmg==='yes'||Q.cfm_booster_dmg==='yes');
-    if(cfmAbnormal){
-      const r=[];
-      if(hasCrit) r.push([...SYMS].filter(s=>crit.includes(s)).join(', '));
-      if(Q.smell==='yes') r.push('olor ave cocida'); if(Q.ecam==='yes') r.push('ECAM');
-      if(is2) r.push('2 motores'); if(cfmZ==='z3') r.push('parámetros anormales/surge/stall');
-      h+=card('imm','🔴','BSI HPC stages 1, 4 y 8 + Booster + Combustion Chamber — INMEDIATA (CFM56)',
-        `<b>Razón: ${r.join(' · ')}</b><br>Secuencia: 1) BSI Booster TASK 72-21-00-290-003-A · 2) BSI HPC stages 1,4,8 (si daño → otras etapas) TASK 72-31-00-290-002-A · 3) BSI Combustion Chamber TASK 72-42-00-290-005-A · 4) Power Assurance Check TASK 71-00-00-710-008-B<br><b>⚠ Si hay indicación en LPT stage 4 (shingling o daño visto desde exhaust nozzle) → BSI LPT stage 4 al mismo turno.</b>`,
-        'ANTES DEL PRÓXIMO VUELO','TASK 72-21-00-290-003-A + TASK 72-31-00-290-002-A + TASK 72-42-00-290-005-A + TASK 71-00-00-710-008-B','','');
-    } else if(cfmNormal){
-      const bladeDmg=Q.cfm_blade_dmg==='yes';
-      h+=card(bladeDmg?'imm':'def',bladeDmg?'🔴':'🟡',
-        bladeDmg?'BSI CFM56 — Missing Material · INMEDIATA':'BSI CFM56 — Normal FOD',
-        'Secuencia: (1) BSI HPC stages 1,4,8 → si daño: etapas restantes · (2) BSI Combustion Chamber dome<br>'+
-        (bladeDmg?'<b>⚠ Missing material en fan blades — BSI INMEDIATA (diferimiento no permitido).</b>':'<b>Diferible 25 FH / 10 FC — solo si NO hay missing material y 1 motor afectado.</b>')+
-        '<br><b>⚠ Si hay indicación en LPT stage 4 (shingling o daño) → BSI LPT stage 4 TASK 72-54-00-290-006-A al mismo turno.</b>',
-        bladeDmg?'ANTES DEL PRÓXIMO VUELO':'25 FH o 10 FC',
-        'TASK 72-31-00-290-002-A (HPC stages 1,4,8) + TASK 72-42-00-290-005-A (Combustion)',
-        bladeDmg?'':'bsi-cfm',
-        bladeDmg?'':'25 FH / 10 FC');
-    } else if(cfmZ==='z1'){
-      h+=card('ok','✅','BSI CFM56 — No Requerida · Zona 1','Solo inlet cowl / fan blades sin missing material. Sin evidencia en booster. BSI no requerida.','','','','');
+    const SRC='AMM 72-00-00-200-006-A';
+    const cfmBlade=Q.cfm_blade_dmg||null, cfmMidspan=Q.cfm_midspan_dmg||null, cfmBooster=Q.cfm_booster_dmg||null;
+    const cfmPreSB=Q.cfm_pre_sb||null;
+    const cfmTriggerYes=cfmBlade==='yes'||cfmMidspan==='yes'||cfmBooster==='yes';
+    const cfmAllAnswered=cfmBlade!==null&&cfmMidspan!==null&&cfmBooster!==null;
+    const cfmAllNo=cfmBlade==='no'&&cfmMidspan==='no'&&cfmBooster==='no';
+    const cfmAbnormalParams=hasCrit||Q.ecam==='yes'||Q.cfm_vib_ecam==='yes';
+    const rTrig=[];
+    if(cfmBlade==='yes') rTrig.push('fan blade missing material / fuera de límites');
+    if(cfmMidspan==='yes') rTrig.push('FOD radialmente inward del mid-span shroud');
+    if(cfmBooster==='yes') rTrig.push('evidencia de debris en booster inlet');
+
+    if(!cfmTriggerYes&&cfmAllAnswered&&cfmAllNo){
+      h+=card('ok','✅','BSI Gaspath CFM56 — No Requerida',
+        `<b>Trigger:</b> Ninguna de las 3 condiciones AMM §4.C.1.a se cumple (fan blade dentro de límites · sin FOD inward del mid-span shroud · sin evidencia en booster inlet).<br><b>Source:</b> ${SRC} §4.C.1.a<br>Solo aplica la inspección visual estándar ya registrada arriba.`,
+        '','','','');
+    } else if(!cfmTriggerYes){
+      h+=card('inf','ℹ️','BSI Gaspath CFM56 — Pendiente de determinar',
+        'Responde las 3 preguntas de trigger (fan blade, mid-span shroud, booster inlet) en la Sección Motor CFM56 para determinar si aplica BSI.','','','','');
+    } else if(cfmAbnormalParams){
+      // RAMA B — AMM 4.C.2 — FOD con parámetros de motor anormales / surge / stall / flameout
+      const rParam=[];
+      if(hasCrit) rParam.push([...SYMS].filter(s=>crit.includes(s)).join(', '));
+      if(Q.ecam==='yes') rParam.push('ECAM motor');
+      if(Q.cfm_vib_ecam==='yes') rParam.push('FAN VIB ECAM ≥6');
+      const trigLine=`<b>Trigger:</b> FOD con parámetros anormales/surge/stall/flameout (${rParam.join(' · ')||'—'})<br><b>Evidencia FOD:</b> ${rTrig.join(' · ')}<br><b>Source:</b> ${SRC} §4.C.2`;
+      h+=grp('CFM56 — BSI Gaspath · RAMA B (Parámetros Anormales)');
+      h+=card('imm','🔴','BSI Booster (completo)',
+        trigLine+'<br>Stages 2, 3, 4, 5 completo.'+
+        (cfmPreSB==='yes'?'<br><b>⚠ Pre-SB 72-0418 — examinar también stage 5 cuidadosamente en lados cóncavo/convexo, área E y blade locks, con el mismo detalle.</b>'
+          :cfmPreSB==='unknown'?'<br>⚠ Estado SB 72-0418 desconocido — verificar antes de cerrar la inspección de stage 5.':''),
+        'ANTES DEL PRÓXIMO VUELO','TASK 72-21-00-290-003-A','','');
+      h+=card('imm','🔴','BSI HPC stages 1, 4, 8',
+        trigLine+'<br>Si hay daño → inspeccionar otras etapas.',
+        'ANTES DEL PRÓXIMO VUELO','TASK 72-31-00-290-002-A','','');
+      h+=card('imm','🔴','BSI Combustion Chamber Dome Assembly',
+        trigLine,
+        'ANTES DEL PRÓXIMO VUELO','TASK 72-42-00-290-005-A (SAC) / TASK 72-42-00-290-005-A-01 (DAC)','','');
+      h+=card('imm','⚡','Power Assurance Check',
+        `<b>Trigger:</b> FOD con parámetros anormales/surge/stall/flameout — exclusivo de esta rama<br><b>Source:</b> ${SRC} §4.C.2`,
+        'ANTES DEL PRÓXIMO VUELO','TASK 71-00-00-710-008-B','','');
+      h+='<div class="warn-box" style="background:#2a1a00;border:1px solid #ff9800;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:0.82rem;color:#ffcc80">⚠ Si hay indicación en LPT stage 4 (shingling o daño visto desde exhaust nozzle) → BSI LPT stage 4 TASK 72-54-00-290-006-A al mismo turno.</div>';
     } else {
-      h+=card('inf','ℹ️','BSI CFM56 — Selecciona zona','Indica la zona más profunda afectada en Sección Motor CFM56.','','','','');
+      // RAMA A — AMM 4.C.1 — FOD con parámetros de motor normales
+      const bladeImm=cfmBlade==='yes';
+      const trigLine=`<b>Trigger:</b> FOD con parámetros de motor normales (${rTrig.join(' · ')})<br><b>Source:</b> ${SRC} §4.C.1`;
+      h+=grp('CFM56 — BSI Gaspath · RAMA A (Parámetros Normales)');
+      h+=card(bladeImm?'imm':'def',bladeImm?'🔴':'🟡','BSI HPC stages 1, 4, 8',
+        trigLine+'<br>Si hay daño → inspeccionar otras etapas.',
+        bladeImm?'ANTES DEL PRÓXIMO VUELO':'25 FH o 10 FC','TASK 72-31-00-290-002-A',
+        bladeImm?'':'bsi-cfm-hpc',bladeImm?'':'25 FH / 10 FC');
+      h+=card(bladeImm?'imm':'def',bladeImm?'🔴':'🟡','BSI Combustion Chamber Dome Assembly',
+        trigLine,
+        bladeImm?'ANTES DEL PRÓXIMO VUELO':'25 FH o 10 FC','TASK 72-42-00-290-005-A (SAC) / TASK 72-42-00-290-005-A-01 (DAC)',
+        bladeImm?'':'bsi-cfm-combustion',bladeImm?'':'25 FH / 10 FC');
+      if(cfmPreSB==='yes'){
+        h+=card(bladeImm?'imm':'def',bladeImm?'🔴':'🟡','BSI Booster Stage 5 (únicamente) — Pre-SB 72-0418',
+          trigLine+'<br>Motor Pre-SB 72-0418. Examinar cuidadosamente lados cóncavo/convexo del stage 5 en área E y blade locks.',
+          bladeImm?'ANTES DEL PRÓXIMO VUELO':'25 FH o 10 FC','TASK 72-21-00-290-003-A',
+          bladeImm?'':'bsi-cfm-stage5',bladeImm?'':'25 FH / 10 FC');
+      } else if(cfmPreSB==='unknown'){
+        h+=card('inf','⚠️','BSI Booster Stage 5 — Verificar estado SB 72-0418',
+          `No se sabe si el motor es Pre o Post SB 72-0418. Verificar antes de cerrar la inspección — si es Pre-SB, aplica BSI de booster stage 5 únicamente.<br><b>Source:</b> ${SRC} §4.C.1`,
+          '','','','');
+      }
+      h+='<div class="warn-box" style="background:#2a1a00;border:1px solid #ff9800;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:0.82rem;color:#ffcc80">'+
+        (bladeImm?'<b>⚠ Missing material en fan blades — BSI INMEDIATA (diferimiento no permitido).</b>':
+          '<b>La BSI puede diferirse 25 FH o 10 FC (lo que ocurra primero), siempre que NO haya missing material en fan blades. En evento de doble motor, la extensión de servicio solo se permite en UN motor.</b>')+
+        '<br>⚠ Si hay indicación en LPT stage 4 (shingling o daño) → BSI LPT stage 4 TASK 72-54-00-290-006-A al mismo turno.</div>';
     }
     if(Q.cfm_vib_ecam==='yes'){
       h+=grp('CFM56 — FAN VIB ECAM');
@@ -1236,7 +1277,7 @@ function renderActions(level){
     h+=grp('Engine Wash');
     const washImm = hasCrit||is2||gtfZ==='z4'||v25Z==='z4';
     if(isCFM){
-      const cfmWashImm=washImm||cfmZ==='z3'||Q.cfm_vib_ecam==='yes'||hasCrit;
+      const cfmWashImm=washImm||Q.ecam==='yes'||Q.cfm_vib_ecam==='yes'||hasCrit;
       if(cfmWashImm){
         h+=card('imm','🚿','Engine Wash — CFM56 · Inmediato','Parámetros anormales / surge / stall o 2 motores. Realizar antes o al mismo tiempo que el BSI.','Antes del próximo vuelo / con BSI','TASK 72-00-00-100-010-A (o según CFM CMM)','','');
       } else {
@@ -1301,13 +1342,13 @@ function renderRTS(level){
   const hasCritRTS=['surge','stall','flame','vibration','rumble','egtrise','parfluct','bang'].some(s=>SYMS.has(s));
   const is2RTS=Q.eng_count==='2';
   const isCFMrts=Q.eng_type==='cfm';
-  const cfmZRTS=Q.cfm_zone||null;
-  const cfmAbnormalRTS=isCFMrts&&(hasCritRTS||Q.smell==='yes'||Q.ecam==='yes'||is2RTS||cfmZRTS==='z3'||Q.cfm_vib_ecam==='yes');
+  const cfmTriggerRTS=Q.cfm_blade_dmg==='yes'||Q.cfm_midspan_dmg==='yes'||Q.cfm_booster_dmg==='yes';
+  const cfmAbnormalRTS=isCFMrts&&(hasCritRTS||Q.ecam==='yes'||Q.cfm_vib_ecam==='yes');
   if(isCFMrts){
     if(Q.cfm_rotor==='no') criteria.push({l:'Rotor CFM56 — no gira libremente (rechazar motor)',ok:false});
     if(Q.cfm_vib_ecam==='yes') criteria.push({l:'FAN VIB ECAM ≥6 units — troubleshooting requerido',ok:false});
-    if(cfmZRTS==='z3'||Q.cfm_vib_ecam==='yes') criteria.push({l:'CFM56 — Parámetros anormales/FAN VIB: BSI completa + Power Assurance Check requeridos',ok:false});
-    if(Q.cfm_blade_dmg==='yes'&&!cfmAbnormalRTS) criteria.push({l:'CFM56 — Missing material en fan blades: BSI inmediata requerida antes del próximo vuelo',ok:false});
+    if(cfmTriggerRTS&&cfmAbnormalRTS) criteria.push({l:'CFM56 — RAMA B (parámetros anormales): BSI Booster completo + HPC + Combustion Chamber + Power Assurance Check requeridos',ok:false});
+    if(Q.cfm_blade_dmg==='yes'&&!cfmAbnormalRTS) criteria.push({l:'CFM56 — Missing material en fan blades: BSI inmediata requerida antes del próximo vuelo (no diferible)',ok:false});
   }
   if(isGTF){
     if(Q.blade_lim==='no'||Q.blade_lim_z3==='no') criteria.push({l:'❌ Fan blade fuera de límites de servicio — Requiere corrección conforme AMM antes del próximo vuelo',ok:false});
@@ -1357,12 +1398,15 @@ function renderRTS(level){
 
   }
   if(isCFMrts){
-    // Booster only (no blade damage, no zone) → usar key diferente para no colisionar con 'bsi-cfm'
-    if(Q.cfm_booster_dmg==='yes'&&Q.cfm_blade_dmg!=='yes'&&!cfmAbnormalRTS&&!DEF['bsi-cfm-booster']&&cfmZRTS!=='z2')
-      implicitDefs.push({title:'BSI HPC + Combustion Chamber — CFM56 · Booster inlet damage',dl:'25 FH / 10 FC',task:'TASK 72-31-00-290-002-A'});
-    // Zone 2 selected
-    if((cfmZRTS==='z2')&&Q.cfm_blade_dmg!=='yes'&&!cfmAbnormalRTS&&!DEF['bsi-cfm'])
-      implicitDefs.push({title:'BSI HPC + Combustion Chamber — CFM56 · Normal FOD',dl:'25 FH / 10 FC',task:'TASK 72-31-00-290-002-A'});
+    // RAMA A (parámetros normales) con trigger disparado y sin missing material → diferible 25 FH / 10 FC
+    if(cfmTriggerRTS&&!cfmAbnormalRTS&&Q.cfm_blade_dmg!=='yes'){
+      if(!DEF['bsi-cfm-hpc'])
+        implicitDefs.push({title:'BSI HPC stages 1,4,8 — CFM56 · RAMA A (Parámetros Normales)',dl:'25 FH / 10 FC',task:'TASK 72-31-00-290-002-A'});
+      if(!DEF['bsi-cfm-combustion'])
+        implicitDefs.push({title:'BSI Combustion Chamber Dome — CFM56 · RAMA A (Parámetros Normales)',dl:'25 FH / 10 FC',task:'TASK 72-42-00-290-005-A'});
+      if(Q.cfm_pre_sb==='yes'&&!DEF['bsi-cfm-stage5'])
+        implicitDefs.push({title:'BSI Booster Stage 5 — CFM56 · Pre-SB 72-0418',dl:'25 FH / 10 FC',task:'TASK 72-21-00-290-003-A'});
+    }
     // Engine Wash CFM: no AMM basis para diferible en parámetros normales — eliminado
   }
   } // end engineAffectedRTS
@@ -1483,8 +1527,8 @@ function exportReport(){
     rotor:'Rotor LPC gira libre',aohx:'Obstrucción AOHX'};
 
   // V2500-specific fields
-  const cfmFields=['cfm_zone','cfm_blade_dmg','cfm_booster_dmg','cfm_blade_broken','cfm_vib_ecam','cfm_rotor'];
-  const lblCFM={cfm_blade_dmg:'Daño fan blades (CFM)',cfm_booster_dmg:'Evidencia en booster inlet',cfm_vib_ecam:'FAN VIB ECAM ≥6 units',cfm_rotor:'Rotor CFM gira libre',cfm_zone:'Zona de evidencia CFM56',cfm_blade_broken:'Fan blade broken/missing CFM'};
+  const cfmFields=['cfm_blade_dmg','cfm_midspan_dmg','cfm_booster_dmg','cfm_blade_broken','cfm_pre_sb','cfm_vib_ecam','cfm_rotor'];
+  const lblCFM={cfm_blade_dmg:'Daño fan blades (CFM)',cfm_midspan_dmg:'FOD inward del mid-span shroud',cfm_booster_dmg:'Evidencia en booster inlet',cfm_vib_ecam:'FAN VIB ECAM ≥6 units',cfm_rotor:'Rotor CFM gira libre',cfm_pre_sb:'Motor Pre-SB 72-0418',cfm_blade_broken:'Fan blade broken/missing CFM'};
   const v25Fields=['v25_blade_dmg','v25_zone','v25_fav','v25_rotor','v25_bl_available','v25_bl_found'];
   const lblV25={v25_blade_dmg:'Daño fan blades/rub',v25_zone:'Zona de evidencia V2500',
     v25_fav:'Daño FAV/OGV (V2500)',v25_rotor:'Rotor LP Compressor libre',
