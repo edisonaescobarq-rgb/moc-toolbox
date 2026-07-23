@@ -1147,10 +1147,11 @@ function renderActions(level){
     const cfmTriggerYes=cfmBladeMissing==='yes'||cfmBladeOutlimits==='yes'||cfmMidspan==='yes'||cfmBooster==='yes';
     const cfmAllAnswered=cfmBladeMissing!==null&&cfmBladeOutlimits!==null&&cfmMidspan!==null&&cfmBooster!==null;
     const cfmAllNo=cfmBladeMissing==='no'&&cfmBladeOutlimits==='no'&&cfmMidspan==='no'&&cfmBooster==='no';
-    const cfmAbnormalParams=hasCrit||Q.ecam==='yes'||Q.cfm_vib_ecam==='yes';
+    const cfmAbnormalParams=hasCrit||Q.ecam==='yes';
     const rTrig=[];
-    if(cfmBladeMissing==='yes') rTrig.push('missing material en fan blade(s)');
-    if(cfmBladeOutlimits==='yes') rTrig.push('fan blade(s) fuera de límite serviceable (sin missing material)');
+    if(cfmBladeMissing==='yes'&&cfmBladeOutlimits==='yes') rTrig.push('missing material en fan blade(s) + fan blade(s) fuera de límite serviceable');
+    else if(cfmBladeMissing==='yes') rTrig.push('missing material en fan blade(s)');
+    else if(cfmBladeOutlimits==='yes') rTrig.push('fan blade(s) fuera de límite serviceable (sin missing material)');
     if(cfmMidspan==='yes') rTrig.push('FOD radialmente inward del mid-span shroud');
     if(cfmBooster==='yes') rTrig.push('evidencia de debris en booster inlet');
 
@@ -1344,7 +1345,7 @@ function renderRTS(level){
   const is2RTS=Q.eng_count==='2';
   const isCFMrts=Q.eng_type==='cfm';
   const cfmTriggerRTS=Q.cfm_blade_missing==='yes'||Q.cfm_blade_outlimits==='yes'||Q.cfm_midspan_dmg==='yes'||Q.cfm_booster_dmg==='yes';
-  const cfmAbnormalRTS=isCFMrts&&(hasCritRTS||Q.ecam==='yes'||Q.cfm_vib_ecam==='yes');
+  const cfmAbnormalRTS=isCFMrts&&(hasCritRTS||Q.ecam==='yes');
   if(isCFMrts){
     if(Q.cfm_rotor==='no') criteria.push({l:'Rotor CFM56 — no gira libremente (rechazar motor)',ok:false});
     if(Q.cfm_vib_ecam==='yes') criteria.push({l:'FAN VIB ECAM ≥6 units — troubleshooting requerido',ok:false});
