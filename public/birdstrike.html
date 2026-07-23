@@ -1348,7 +1348,7 @@ function renderRTS(level){
   const cfmAbnormalRTS=isCFMrts&&(hasCritRTS||Q.ecam==='yes');
   if(isCFMrts){
     if(Q.cfm_rotor==='no') criteria.push({l:'Rotor CFM56 — no gira libremente (rechazar motor)',ok:false});
-    if(Q.cfm_vib_ecam==='yes') criteria.push({l:'FAN VIB ECAM ≥6 units — troubleshooting requerido',ok:false});
+    if(Q.cfm_vib_ecam==='yes') criteria.push({l:'FAN VIB ≥6 units — TSM 77-00-00-810-864 pendiente de resolver (independiente de otras alertas ECAM)',ok:false});
     if(cfmTriggerRTS&&cfmAbnormalRTS) criteria.push({l:'CFM56 — RAMA B (parámetros anormales): BSI Booster completo + HPC + Combustion Chamber + Power Assurance Check requeridos',ok:false});
     if(Q.cfm_blade_missing==='yes'&&!cfmAbnormalRTS) criteria.push({l:'CFM56 — Missing material en fan blades: BSI inmediata requerida antes del próximo vuelo (no diferible)',ok:false});
   }
@@ -1427,6 +1427,11 @@ function renderRTS(level){
     html+=`<div style="margin:10px 0 4px;font-size:0.7rem;font-weight:700;color:#f9a825;text-transform:uppercase;letter-spacing:.05em;border-top:1px solid #2a3f1a;padding-top:8px">
       📌 Inspecciones Diferidas — Deben completarse dentro del plazo
     </div>`;
+    if(implicitDefs.length>0&&criteria.some(x=>!x.ok)){
+      html+=`<div style="margin:0 0 8px;padding:6px 10px;background:#3d0000;border-left:3px solid #e53935;border-radius:0 6px 6px 0;font-size:0.7rem;color:#ff8a80">
+        ⚠ La extensión de BSI no constituye autorización de RTS. Los criterios marcados en rojo arriba deben resolverse antes del próximo vuelo.
+      </div>`;
+    }
     allDefs.forEach(d=>{
       html+=`<div class="rtsrow" style="background:#1a1500;border-radius:6px;padding:5px 8px;margin-bottom:3px">
         <div class="rtsd" style="background:#f9a825"></div>
