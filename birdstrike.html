@@ -1152,7 +1152,7 @@ function renderActions(level){
     if(cfmBladeMissing==='yes'&&cfmBladeOutlimits==='yes') rTrig.push('missing material en fan blade(s) + fan blade(s) fuera de límite serviceable');
     else if(cfmBladeMissing==='yes') rTrig.push('missing material en fan blade(s)');
     else if(cfmBladeOutlimits==='yes') rTrig.push('fan blade(s) fuera de límite serviceable (sin missing material)');
-    if(cfmMidspan==='yes') rTrig.push('FOD radialmente inward del mid-span shroud');
+    if(cfmMidspan==='yes') rTrig.push('FOD impactó radialmente hacia el mid-span shroud');
     if(cfmBooster==='yes') rTrig.push('evidencia de debris en booster inlet');
 
     if(!cfmTriggerYes&&cfmAllAnswered&&cfmAllNo){
@@ -1332,7 +1332,7 @@ function renderRTS(level){
     {l:'Sin vibración anormal en airframe',                    ok:Q.airframe_vib!=='yes'},
     {l:'Sin olor a ave cocida (ECS posiblemente afectado)',     ok:Q.smell!=='yes', skip:!engineAffectedRTS},
     {l:'Sin ECAM alertas no resueltas',                        ok:Q.ecam!=='yes', skip:!engineAffectedRTS},
-    {l:'Rotor LP Compressor gira libremente',                  ok:Q.rotor!=='no'&&Q.v25_rotor!=='no', skip:!engineAffectedRTS},
+    {l:'Rotor LP Compressor gira libremente',                  ok:Q.rotor!=='no'&&Q.v25_rotor!=='no'&&!(Q.eng_type==='cfm'&&Q.cfm_rotor==='no'), skip:!engineAffectedRTS},
     {l:'Sin metal debris en bleed valve screen — V2500',       ok:Q.bleed_metal!=='yes', skip:!isV25||!engineAffectedRTS||!Q.bleed_metal},
     {l:'Radome inspeccionado sin daño crítico',                ok:Q.radome_dmg!=='yes'},
     {l:'Sin fugas de fluidos',                                 ok:Q.leaks!=='yes'},
