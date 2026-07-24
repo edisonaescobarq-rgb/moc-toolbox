@@ -592,7 +592,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
       ⚠️ <b>RESTRICCIÓN AMM — SOLO UN MOTOR PUEDE DIFERIR</b><br>
       AMM 72-00-00-200-006-A §4.C.1.a: la extensión de servicio 25 FH/10 FC solo se permite en UN motor en un evento de FOD de doble motor. Si el otro motor no tiene su BSI completada, <b>este motor NO puede diferir</b>.
     </div>
-    <div class="qr">
+    <div class="qr" id="cfm-dual-bsi-q" style="display:none">
       <div class="qt"><span id="cfm-dual-bsi-qtext">¿Se completaron las BSI requeridas en el otro motor antes del próximo vuelo?</span></div>
       <div class="yw">
         <button class="yb yes" onclick="pick('cfm_dual_engine_other_bsi','yes',this)">SÍ</button>
@@ -925,11 +925,16 @@ function render(){
     const hasRestos = Q.visual_found==='yes' || Q.uv_found==='yes';
     gtfWarn.style.display = (hasRestos && Q.gtf_zone==='z1') ? 'block' : 'none';
   }
-  // CFM56 dual-engine: mostrar identificador de motor solo si eng_count==='2', y actualizar texto de la pregunta de restricción
+  // CFM56 dual-engine: mostrar identificador de motor, warn-box y pregunta de restricción SOLO si
+  // hay 2 motores, este motor NO tiene missing material, y SÍ tiene algún otro trigger de BSI elegible a diferir.
+  const cfmDualEngineVisible = Q.eng_count==='2' && Q.cfm_blade_missing!=='yes' &&
+    (Q.cfm_blade_outlimits==='yes'||Q.cfm_midspan_dmg==='yes'||Q.cfm_booster_dmg==='yes');
   const cfmEngNumEl = document.getElementById('cfm-eng-number-q');
-  if(cfmEngNumEl) cfmEngNumEl.style.display = Q.eng_count==='2' ? 'block' : 'none';
+  if(cfmEngNumEl) cfmEngNumEl.style.display = cfmDualEngineVisible ? 'block' : 'none';
   const cfmDualEngineWarnEl = document.getElementById('cfm-dual-engine-warn');
-  if(cfmDualEngineWarnEl) cfmDualEngineWarnEl.style.display = Q.eng_count==='2' ? 'block' : 'none';
+  if(cfmDualEngineWarnEl) cfmDualEngineWarnEl.style.display = cfmDualEngineVisible ? 'block' : 'none';
+  const cfmDualBsiQEl = document.getElementById('cfm-dual-bsi-q');
+  if(cfmDualBsiQEl) cfmDualBsiQEl.style.display = cfmDualEngineVisible ? 'block' : 'none';
   const cfmDualBsiQtextEl = document.getElementById('cfm-dual-bsi-qtext');
   if(cfmDualBsiQtextEl){
     const otherLabel = Q.cfm_eng_number ? (Q.cfm_eng_number==='eng1'?'ENG 2':'ENG 1') : null;
