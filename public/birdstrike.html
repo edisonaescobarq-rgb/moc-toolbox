@@ -581,6 +581,26 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e0e0e0;fo
       </div>
     </div>
 
+    <div class="qr" id="cfm-eng-number-q" style="display:none">
+      <div class="qt">Motor actualmente evaluado (solo para este evento dual-engine)</div>
+      <div class="yw">
+        <button class="yb opt" onclick="pick('cfm_eng_number','eng1',this)">ENG 1</button>
+        <button class="yb opt" onclick="pick('cfm_eng_number','eng2',this)">ENG 2</button>
+      </div>
+    </div>
+    <div class="warn-box" id="cfm-dual-engine-warn" style="display:none;background:#2a1a00;border:1px solid #ff9800;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:0.82rem;color:#ffcc80">
+      ⚠️ <b>RESTRICCIÓN AMM — SOLO UN MOTOR PUEDE DIFERIR</b><br>
+      AMM 72-00-00-200-006-A §4.C.1.a: la extensión de servicio 25 FH/10 FC solo se permite en UN motor en un evento de FOD de doble motor. Si el otro motor no tiene su BSI completada, <b>este motor NO puede diferir</b>.
+    </div>
+    <div class="qr">
+      <div class="qt"><span id="cfm-dual-bsi-qtext">¿Se completaron las BSI requeridas en el otro motor antes del próximo vuelo?</span></div>
+      <div class="yw">
+        <button class="yb yes" onclick="pick('cfm_dual_engine_other_bsi','yes',this)">SÍ</button>
+        <button class="yb no" onclick="pick('cfm_dual_engine_other_bsi','no',this)">NO</button>
+        <button class="yb opt" onclick="pick('cfm_dual_engine_other_bsi','pending',this)">PENDIENTE</button>
+      </div>
+    </div>
+
     <div class="sl">Cierre</div>
     <div class="dr"><div class="cb cfm" onclick="chk(this,'cf10')"></div><div class="dt">Cerrar TR doors + hacer TR serviceable · Cerrar fan cowl doors · Retirar WARNING NOTICE(S) <span class="bdg b1">TASK 78-36-00-410-040-B · TASK 78-30-00-081-041-B · TASK 71-13-00-410-040-B</span></div></div>
   </div>
@@ -639,7 +659,7 @@ function pick(id,val,btn){
     document.getElementById('sec-cfm').style.display=val==='cfm'?'block':'none';
     if(val==='v25'){
       // Clear all GTF-specific variables
-      ['uv_available','uv_found','visual_found','gtf_zone','area_a','blade_lim','blade_lim_z3','blade_broken','probe_ok','gtf_fav','rotor','aohx','cfm_blade_missing','cfm_blade_outlimits','cfm_booster_dmg','cfm_blade_broken','cfm_vib_ecam','cfm_rotor','cfm_midspan_dmg','cfm_pre_sb','v25_blade_replaced'].forEach(k=>delete Q[k]);
+      ['uv_available','uv_found','visual_found','gtf_zone','area_a','blade_lim','blade_lim_z3','blade_broken','probe_ok','gtf_fav','rotor','aohx','cfm_blade_missing','cfm_blade_outlimits','cfm_booster_dmg','cfm_blade_broken','cfm_vib_ecam','cfm_rotor','cfm_midspan_dmg','cfm_pre_sb','cfm_dual_engine_other_bsi','cfm_eng_number','v25_blade_replaced'].forEach(k=>delete Q[k]);
       const uvResEl=document.getElementById('uv-result-q'); if(uvResEl) uvResEl.style.display='none';
       const uvNoEl=document.getElementById('uv-noavail-q'); if(uvNoEl) uvNoEl.style.display='none';
       // Reset GTF UI
@@ -656,7 +676,7 @@ function pick(id,val,btn){
     }
     if(val==='gtf'){
       // Clear all V2500-specific variables
-      ['v25_zone','v25_zq1','v25_zq2','v25_zq3','v25_zq4','v25_blade_dmg','v25_fav','v25_rotor','v25_bl_available','v25_bl_found','bleed_metal','cfm_blade_missing','cfm_blade_outlimits','cfm_booster_dmg','cfm_vib_ecam','cfm_rotor','cfm_midspan_dmg','cfm_pre_sb'].forEach(k=>delete Q[k]);
+      ['v25_zone','v25_zq1','v25_zq2','v25_zq3','v25_zq4','v25_blade_dmg','v25_fav','v25_rotor','v25_bl_available','v25_bl_found','bleed_metal','cfm_blade_missing','cfm_blade_outlimits','cfm_booster_dmg','cfm_vib_ecam','cfm_rotor','cfm_midspan_dmg','cfm_pre_sb','cfm_dual_engine_other_bsi','cfm_eng_number'].forEach(k=>delete Q[k]);
       const v25blEl=document.getElementById('v25-bl-result-q'); if(v25blEl) v25blEl.style.display='none';
       // Reset V2500 UI
       const fav=document.getElementById('v25-fav-q'); if(fav) fav.style.display='none';
@@ -904,6 +924,18 @@ function render(){
   if(gtfWarn){
     const hasRestos = Q.visual_found==='yes' || Q.uv_found==='yes';
     gtfWarn.style.display = (hasRestos && Q.gtf_zone==='z1') ? 'block' : 'none';
+  }
+  // CFM56 dual-engine: mostrar identificador de motor solo si eng_count==='2', y actualizar texto de la pregunta de restricción
+  const cfmEngNumEl = document.getElementById('cfm-eng-number-q');
+  if(cfmEngNumEl) cfmEngNumEl.style.display = Q.eng_count==='2' ? 'block' : 'none';
+  const cfmDualEngineWarnEl = document.getElementById('cfm-dual-engine-warn');
+  if(cfmDualEngineWarnEl) cfmDualEngineWarnEl.style.display = Q.eng_count==='2' ? 'block' : 'none';
+  const cfmDualBsiQtextEl = document.getElementById('cfm-dual-bsi-qtext');
+  if(cfmDualBsiQtextEl){
+    const otherLabel = Q.cfm_eng_number ? (Q.cfm_eng_number==='eng1'?'ENG 2':'ENG 1') : null;
+    cfmDualBsiQtextEl.textContent = otherLabel
+      ? `¿Se completaron las BSI requeridas en ${otherLabel} antes del próximo vuelo?`
+      : '¿Se completaron las BSI requeridas en el otro motor antes del próximo vuelo?';
   }
 }
 
@@ -1213,6 +1245,19 @@ function renderActions(level){
         (bladeImm?'<b>⚠ Missing material en fan blades — BSI INMEDIATA (diferimiento no permitido).</b>':
           '<b>La BSI puede diferirse 25 FH o 10 FC (lo que ocurra primero), siempre que NO haya missing material en fan blades. En evento de doble motor, la extensión de servicio solo se permite en UN motor.</b>')+
         '<br>⚠ Si hay indicación en LPT stage 4 (shingling o daño) → BSI LPT stage 4 TASK 72-54-00-290-006-A al mismo turno.</div>';
+      if(is2&&!bladeImm){
+        const otherLabel = Q.cfm_eng_number ? (Q.cfm_eng_number==='eng1'?'ENG 2':'ENG 1') : 'el otro motor';
+        if(Q.cfm_dual_engine_other_bsi==='yes'){
+          h+=card('ok','✅','Restricción Dual Engine BSI — Cumplida',
+            `Las BSI requeridas fueron completadas en ${otherLabel}. La extensión 25 FH/10 FC puede aplicarse a este motor, sujeto al cumplimiento de las demás condiciones aplicables del AMM.<br><b>Source:</b> AMM 72-00-00-200-006-A §4.C.1.a NOTE`,'','','','');
+        } else if(Q.cfm_dual_engine_other_bsi==='no'){
+          h+=card('imm','⛔','Restricción Dual Engine BSI — NO Cumplida',
+            'La extensión de servicio no puede aplicarse simultáneamente a ambos motores en un evento dual-engine FOD.<br><b>Source:</b> AMM 72-00-00-200-006-A §4.C.1.a NOTE','','','','');
+        } else {
+          h+=card('inf','⚠️','Restricción Dual Engine BSI — Pendiente de Confirmación',
+            'No se ha confirmado el cumplimiento de la restricción de extensión para evento dual-engine FOD.<br><b>Source:</b> AMM 72-00-00-200-006-A §4.C.1.a NOTE','','','','');
+        }
+      }
     }
     if(Q.cfm_vib_ecam==='yes'){
       h+=grp('CFM56 — FAN VIB ECAM');
@@ -1346,11 +1391,16 @@ function renderRTS(level){
   const isCFMrts=Q.eng_type==='cfm';
   const cfmTriggerRTS=Q.cfm_blade_missing==='yes'||Q.cfm_blade_outlimits==='yes'||Q.cfm_midspan_dmg==='yes'||Q.cfm_booster_dmg==='yes';
   const cfmAbnormalRTS=isCFMrts&&(hasCritRTS||Q.ecam==='yes');
+  const cfmHasDeferrableBSI=cfmTriggerRTS&&!cfmAbnormalRTS&&Q.cfm_blade_missing!=='yes';
   if(isCFMrts){
     if(Q.cfm_rotor==='no') criteria.push({l:'Rotor CFM56 — no gira libremente (rechazar motor)',ok:false});
     if(Q.cfm_vib_ecam==='yes') criteria.push({l:'FAN VIB ≥6 units — TSM 77-00-00-810-864 pendiente de resolver (independiente de otras alertas ECAM)',ok:false});
     if(cfmTriggerRTS&&cfmAbnormalRTS) criteria.push({l:'CFM56 — RAMA B (parámetros anormales): BSI Booster completo + HPC + Combustion Chamber + Power Assurance Check requeridos',ok:false});
     if(Q.cfm_blade_missing==='yes'&&!cfmAbnormalRTS) criteria.push({l:'CFM56 — Missing material en fan blades: BSI inmediata requerida antes del próximo vuelo (no diferible)',ok:false});
+    if(is2RTS&&cfmHasDeferrableBSI){
+      const cfmOtherLabelRTS = Q.cfm_eng_number ? (Q.cfm_eng_number==='eng1'?'ENG 2':'ENG 1') : 'el otro motor';
+      criteria.push({l:'Evento doble motor — BSI en '+cfmOtherLabelRTS+': '+(Q.cfm_dual_engine_other_bsi==='yes'?'confirmada':Q.cfm_dual_engine_other_bsi==='no'?'NO cumplida (extensión no permitida en ambos motores)':'sin confirmar'),ok:Q.cfm_dual_engine_other_bsi==='yes'});
+    }
   }
   if(isGTF){
     if(Q.blade_lim==='no'||Q.blade_lim_z3==='no') criteria.push({l:'❌ Fan blade fuera de límites de servicio — Requiere corrección conforme AMM antes del próximo vuelo',ok:false});
@@ -1533,8 +1583,8 @@ function exportReport(){
     rotor:'Rotor LPC gira libre',aohx:'Obstrucción AOHX'};
 
   // V2500-specific fields
-  const cfmFields=['cfm_blade_missing','cfm_blade_outlimits','cfm_midspan_dmg','cfm_booster_dmg','cfm_blade_broken','cfm_pre_sb','cfm_vib_ecam','cfm_rotor'];
-  const lblCFM={cfm_blade_missing:'Missing material en fan blade(s)',cfm_blade_outlimits:'Fan blade(s) fuera de límite serviceable',cfm_midspan_dmg:'FOD inward del mid-span shroud',cfm_booster_dmg:'Evidencia en booster inlet',cfm_vib_ecam:'FAN VIB ECAM ≥6 units',cfm_rotor:'Rotor CFM gira libre',cfm_pre_sb:'Motor Pre-SB 72-0418',cfm_blade_broken:'Fan blade broken/missing CFM'};
+  const cfmFields=['cfm_eng_number','cfm_blade_missing','cfm_blade_outlimits','cfm_midspan_dmg','cfm_booster_dmg','cfm_blade_broken','cfm_pre_sb','cfm_dual_engine_other_bsi','cfm_vib_ecam','cfm_rotor'];
+  const lblCFM={cfm_eng_number:'Motor evaluado (dual-engine)',cfm_blade_missing:'Missing material en fan blade(s)',cfm_blade_outlimits:'Fan blade(s) fuera de límite serviceable',cfm_midspan_dmg:'FOD inward del mid-span shroud',cfm_booster_dmg:'Evidencia en booster inlet',cfm_vib_ecam:'FAN VIB ECAM ≥6 units',cfm_rotor:'Rotor CFM gira libre',cfm_pre_sb:'Motor Pre-SB 72-0418',cfm_dual_engine_other_bsi:'BSI completada en el otro motor (dual engine)',cfm_blade_broken:'Fan blade broken/missing CFM'};
   const v25Fields=['v25_blade_dmg','v25_zone','v25_fav','v25_rotor','v25_bl_available','v25_bl_found'];
   const lblV25={v25_blade_dmg:'Daño fan blades/rub',v25_zone:'Zona de evidencia V2500',
     v25_fav:'Daño FAV/OGV (V2500)',v25_rotor:'Rotor LP Compressor libre',
